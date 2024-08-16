@@ -1,0 +1,188 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #f0f0f0; /* Light grey background */
+    color: black; /* Set default font color to black */
+}
+
+.App {
+    text-align: center;
+    max-width: 100%;
+    overflow-x: hidden;
+    padding: 20px; /* Add padding for better spacing */
+}
+
+.App-logo {
+    height: 80px; /* Reduced the size for a more compact logo */
+    max-width: 100%;
+    object-fit: contain;
+    margin-bottom: 20px; /* Add margin bottom for spacing */
+}
+
+.App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    font-size: calc(10px + 2vmin);
+    color: white;
+    border-radius: 10px; /* Add border radius for smooth corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+}
+
+.App-header h1 {
+    color: #FFD700; /* Gold color for better visibility */
+}
+
+.App-link {
+    color: #61dafb;
+}
+
+button {
+    background-color: #4CAF50; /* Tomato green background */
+    border: none;
+    color: white; /* White font color */
+    font-weight: bold; /* Bold font */
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.section {
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    color: black; /* Ensure text color is black */
+}
+
+.section h2 {
+    color: #4CAF50; /* Tomato green */
+    margin-bottom: 10px;
+}
+
+/* Styles for PerformAction component */
+.perform-action {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.perform-action button {
+    flex: 1 1 45%;
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #4CAF50; /* Tomato green background */
+    color: black !important; /* Black font color */
+    font-weight: bold !important; /* Bold font */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.perform-action button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+input[type="text"] {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.error-message {
+    color: red;
+    margin: 10px 0;
+}
+
+/* Styles for AccountInfo component */
+.AccountInfo {
+    text-align: left;
+    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 0.9em; /* Reduce font size slightly */
+}
+
+.AccountInfo p {
+    margin: 5px 0;
+}
+
+/* CPU Status Bar */
+.CpuStatus {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.CpuStatusBar {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.CpuStatusFill {
+    height: 20px;
+    transition: width 0.5s ease-in-out;
+}
+
+.CpuStatusFill.green {
+    background-color: #4CAF50; /* Green */
+}
+
+.CpuStatusFill.yellow {
+    background-color: #FFEB3B; /* Yellow */
+}
+
+.CpuStatusFill.red {
+    background-color: #F44336; /* Red */
+}
+
+.CpuRow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.CpuRow p {
+    margin: 3px 0;
+    font-size: 0.8em; /* Reduce font size for CPU status */
+    flex: 1;
+    min-width: 100px;
+}

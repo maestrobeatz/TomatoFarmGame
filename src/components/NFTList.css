@@ -1,0 +1,96 @@
+.nft-list {
+  padding: 20px;
+}
+
+.nft-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.nft-filters input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.nft-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.nft-card {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: calc(50% - 10px);
+  cursor: pointer;
+}
+
+.nft-card img {
+  width: 100%;
+  height: auto;
+}
+
+.nft-details {
+  padding: 10px;
+}
+
+.nft-details h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.nft-details p {
+  margin: 5px 0 0;
+  color: #555;
+}
+
+@media (min-width: 600px) {
+  .nft-card {
+    width: 150px;
+  }
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 90%;
+  max-height: 90%;
+  text-align: center;
+}
+
+.modal-content img {
+  width: 100%;
+  height: auto;
+}
+
+.modal-details {
+  margin-top: 10px;
+}
+
+.modal-details h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.modal-details p {
+  margin: 5px 0;
+  color: #555;
+}

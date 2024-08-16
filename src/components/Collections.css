@@ -1,0 +1,26 @@
+/* Collections.css */
+.collections-container {
+    padding: 20px;
+}
+
+.collections-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.collection-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.error-message {
+    color: red;
+}
+
+.loading {
+    color: blue;
+}
+
+.empty-message {
+    color: gray;
+}

@@ -1,0 +1,60 @@
+{
+    "accept": "받아들이다",
+    "cancel": "취소",
+    "close": "닫다",
+    "decline": "거절하다",
+    "error": {
+        "title": "오류",
+        "subtitle": "오류가 발생했습니다."
+    },
+    "loading": "로드...",
+    "login": {
+        "complete": "",
+        "enter": {
+            "account": "Enter account name",
+            "lookup": "Lookup Account",
+            "not_found": "Unable to find account"
+        },
+        "select": {
+            "account": "계정 선택",
+            "blockchain": "블록체인 선택",
+            "wallet": "지갑 선택",
+            "no_match": "{{publicKey}}와 일치하는 계정을 찾을 수 없습니다."
+        },
+        "title": "로그인",
+        "title-app": "{{appName}}에 로그인"
+    },
+    "transact": {
+        "title": "거래하다",
+        "subtitle": " ",
+        "processing": "Performing transaction...",
+        "signing": "서명 트랜잭션",
+        "signed": "트랜잭션 서명",
+        "broadcasting": "방송 거래",
+        "broadcasted": "거래 방송"
+    },
+    "settings": {
+        "title": "설정",
+        "language": {
+            "title": "언어"
+        },
+        "theme": {
+            "title": "테마",
+            "automatic": "자동",
+            "light": "밝은 테마",
+            "dark": "어두운 테마"
+        },
+        "animations": {
+            "title": "애니메이션",
+            "enabled": "활성화",
+            "disabled": "비활성화"
+        },
+        "github": "Github에서 문제 보고",
+        "about": {
+            "title": "정보",
+            "version": "{{version}} 버전",
+            "author": "",
+            "link": "부두에 대해 자세히 알아보기"
+        }
+    }
+}

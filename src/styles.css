@@ -1,0 +1,118 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.App {
+    text-align: center;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+.App-logo {
+    height: 40vmin;
+    max-width: 100%;
+    object-fit: contain;
+}
+.App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+.App-link {
+    color: #61dafb;
+}
+button, .perform-action button {
+    background-color: #4CAF50; /* Green background */
+    border: none;
+    color: black; /* Black font */
+    font-weight: bold; /* Bold font */
+    padding: 10px 20px; /* Consistent padding */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px; /* Consistent font size */
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+button:hover, .perform-action button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+.section {
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 600px;
+}
+/* Styles for PerformAction component */
+.perform-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 10px auto;
+}
+.actions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.status {
+    font-size: 12px; /* Adjusted font size */
+    margin-top: 5px;
+}
+.nft-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.nft-status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.nft-status-item p {
+  margin: 5px 0;
+}
+
+.nft-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.status {
+  font-weight: bold;
+}
+
+.status.success {
+  color: green;
+}
+
+.status.error {
+  color: red;
+}
+
+@media (max-width: 768px) {
+    .App-header {
+        padding: 10px;
+    }
+    button, .perform-action button {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}

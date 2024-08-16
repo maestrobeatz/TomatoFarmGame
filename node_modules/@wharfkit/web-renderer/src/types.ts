@@ -1,0 +1,63 @@
+export type Theme = 'light' | 'dark'
+
+export type TransitionDirection = 'ltr' | 'rtl' | 'ttb' | 'btt'
+
+export type PercentageString = `${number}%`
+
+export type Space =
+    | 'var(--space-4xs)'
+    | 'var(--space-3xs)'
+    | 'var(--space-2xs)'
+    | 'var(--space-xs)'
+    | 'var(--space-s)'
+    | 'var(--space-m)'
+    | 'var(--space-l)'
+    | 'var(--space-xl)'
+    | 'var(--space-2xl)'
+    | 'var(--space-3xl)'
+    | 'var(--space-4xl)'
+    | 'var(--space-5xl)'
+    | 'var(--space-6xl)'
+    | 'var(--space-7xl)'
+    | 'var(--space-8xl)'
+    | 'var(--space-9xl)'
+    | 'var(--border-radius-outer)'
+    | 'var(--border-radius-inner)'
+    | 'var(--header-height)'
+
+export type FontSize = '--fs-0' | '--fs-1' | '--fs-2' | '--fs-3'
+
+export type ThemeColor =
+    | 'var(--body-background-color)'
+    | 'var(--body-text-color)'
+    | 'var(--body-text-color-variant)'
+    | 'var(--header-background-color)'
+    | 'var(--header-text-color)'
+    | 'var(--header-button-background)'
+    | 'var(--header-button-outline)'
+    | 'var(--button-text-color)'
+    | 'var(--button-text-color-active)'
+    | 'var(--button-outline-active)'
+    | 'var(--button-primary-background)'
+    | 'var(--button-primary-background-hover)'
+    | 'var(--button-primary-background-active)'
+    | 'var(--button-primary-outline-hover)'
+    | 'var(--button-secondary-background)'
+    | 'var(--button-secondary-background-hover)'
+    | 'var(--button-secondary-background-active)'
+    | 'var(--button-secondary-outline-hover)'
+    | 'var(--button-outlined-background-active)'
+    | 'var(--button-outlined-outline)'
+    | 'var(--button-outlined-outline-hover)'
+    | 'var(--input-placeholder-color)'
+    | 'var(--input-background-focus)'
+    | 'var(--input-border-color)'
+    | 'var(--input-border-color-focus)'
+    | 'var(--checkbox-stroke)'
+    | 'var(--checkbox-fill)'
+    | 'var(--error-color)'
+
+export type SelectorOptions<T> = {
+    label: string
+    value: T
+}
