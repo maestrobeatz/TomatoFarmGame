@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/TomatoFarmGame/static/css/main.8c655419.css",
-    "main.js": "/TomatoFarmGame/static/js/main.7c0f2812.js",
+    "main.css": "/TomatoFarmGame/static/css/main.bd87a7af.css",
+    "main.js": "/TomatoFarmGame/static/js/main.f1a460ab.js",
     "static/js/285.43762cc0.chunk.js": "/TomatoFarmGame/static/js/285.43762cc0.chunk.js",
     "static/media/MaestroBeatzLogo.png": "/TomatoFarmGame/static/media/MaestroBeatzLogo.f106305313d7314f20c6.png",
     "index.html": "/TomatoFarmGame/index.html",
-    "main.8c655419.css.map": "/TomatoFarmGame/static/css/main.8c655419.css.map",
-    "main.7c0f2812.js.map": "/TomatoFarmGame/static/js/main.7c0f2812.js.map",
+    "main.bd87a7af.css.map": "/TomatoFarmGame/static/css/main.bd87a7af.css.map",
+    "main.f1a460ab.js.map": "/TomatoFarmGame/static/js/main.f1a460ab.js.map",
     "285.43762cc0.chunk.js.map": "/TomatoFarmGame/static/js/285.43762cc0.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.8c655419.css",
-    "static/js/main.7c0f2812.js"
+    "static/css/main.bd87a7af.css",
+    "static/js/main.f1a460ab.js"
   ]
 }
