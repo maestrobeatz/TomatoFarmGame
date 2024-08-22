@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/TomatoFarmGame/static/css/main.35185156.css",
-    "main.js": "/TomatoFarmGame/static/js/main.f2e2264e.js",
+    "main.js": "/TomatoFarmGame/static/js/main.ff4f200c.js",
     "static/js/285.43762cc0.chunk.js": "/TomatoFarmGame/static/js/285.43762cc0.chunk.js",
     "index.html": "/TomatoFarmGame/index.html",
     "main.35185156.css.map": "/TomatoFarmGame/static/css/main.35185156.css.map",
-    "main.f2e2264e.js.map": "/TomatoFarmGame/static/js/main.f2e2264e.js.map",
+    "main.ff4f200c.js.map": "/TomatoFarmGame/static/js/main.ff4f200c.js.map",
     "285.43762cc0.chunk.js.map": "/TomatoFarmGame/static/js/285.43762cc0.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.35185156.css",
-    "static/js/main.f2e2264e.js"
+    "static/js/main.ff4f200c.js"
   ]
 }
