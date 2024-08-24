@@ -117,7 +117,7 @@
  */
 
 /**
- * @wharfkit/antelope v1.0.12
+ * @wharfkit/antelope v1.0.8
  * https://github.com/wharfkit/antelope
  *
  * @license
@@ -153,7 +153,7 @@
  */
 
 /**
- * @wharfkit/protocol-esr v1.3.2
+ * @wharfkit/protocol-esr v1.3.1
  * https://github.com/wharfkit/protocol-esr
  *
  * @license
@@ -261,7 +261,7 @@
  */
 
 /**
- * @wharfkit/wallet-plugin-anchor v1.4.0
+ * @wharfkit/wallet-plugin-anchor v1.3.5
  * https://github.com/wharfkit/wallet-plugin-anchor
  *
  * @license
