@@ -117,7 +117,7 @@
  */
 
 /**
- * @wharfkit/antelope v1.0.8
+ * @wharfkit/antelope v1.0.12
  * https://github.com/wharfkit/antelope
  *
  * @license
