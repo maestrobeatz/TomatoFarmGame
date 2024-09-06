@@ -1,7 +1,6 @@
-// FarmersList.js
 import React from 'react';
 
-const FarmersList = ({ farmers }) => {
+const FarmersList = React.memo(({ farmers }) => {
   console.log('Rendering FarmersList, farmers:', farmers);
 
   return (
@@ -18,6 +17,6 @@ const FarmersList = ({ farmers }) => {
       )}
     </div>
   );
-};
+});
 
 export default FarmersList;

@@ -1,0 +1,67 @@
+.onboarding-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f0e3;
+  border-radius: 15px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+  transition: height 0.3s ease, background-color 0.3s ease;
+  height: auto;
+}
+
+.onboarding-container h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #8c2f39; /* Tomato-themed color */
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.onboarding-container p, .onboarding-container ol {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  color: #3b3a30; /* Darker color for better readability */
+  font-family: 'Verdana', sans-serif;
+}
+
+.onboarding-container ol {
+  padding-left: 30px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+button {
+  padding: 12px 24px;
+  font-size: 18px;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  background-color: #8c2f39; /* Tomato-themed color */
+  color: white;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+button:hover {
+  background-color: #b23a48;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .onboarding-container {
+    width: 100%;
+    padding: 15px;
+  }
+
+  button {
+    width: 100%;
+    font-size: 16px;
+  }
+}

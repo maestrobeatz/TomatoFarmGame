@@ -12,13 +12,14 @@ const NFTList = ({ actor }) => {
   useEffect(() => {
     const fetchNFTs = async () => {
       setLoading(true);
+      setError(null); // Reset error state
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/nftCounts/${actor}`);
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/nfts/${actor}`);
         if (!response.ok) {
           throw new Error(`Error fetching NFTs: ${response.statusText}`);
         }
         const data = await response.json();
-        if (data && data.nfts) {
+        if (data && Array.isArray(data.nfts)) {
           setNfts(data.nfts);
         } else {
           setError('No NFTs found');
@@ -42,11 +43,21 @@ const NFTList = ({ actor }) => {
     setSelectedNFT(null);
   };
 
-  const filteredNFTs = nfts.filter(nft => 
-    selectedName === '' || nft.nft.data.name === selectedName
+  // Group NFTs by name and count them
+  const groupedNFTs = nfts.reduce((acc, nft) => {
+    const name = nft.data.name;
+    if (!acc[name]) {
+      acc[name] = { ...nft, count: 0 };
+    }
+    acc[name].count += 1;
+    return acc;
+  }, {});
+
+  const filteredNFTs = Object.values(groupedNFTs).filter(nft => 
+    selectedName === '' || nft.data.name === selectedName
   );
 
-  const uniqueNames = [...new Set(nfts.map(nft => nft.nft.data.name))];
+  const uniqueNames = Object.keys(groupedNFTs);
 
   return (
     <div className="nft-list">
@@ -65,13 +76,13 @@ const NFTList = ({ actor }) => {
         <p>{error}</p>
       ) : filteredNFTs.length > 0 ? (
         <div className="nft-grid">
-          {filteredNFTs.map(({ nft, count }) => (
+          {filteredNFTs.map(nft => (
             <div key={nft.asset_id} className="nft-card" onClick={() => handleNFTClick(nft)}>
               <img src={`https://ipfs.io/ipfs/${nft.data.img}`} alt={nft.data.name} />
               <div className="nft-details">
                 <h3>{nft.data.name}</h3>
                 <p>Template ID: {nft.template.template_id}</p>
-                <p>Count: {count}</p>
+                <p>Count: {nft.count}</p>
               </div>
             </div>
           ))}

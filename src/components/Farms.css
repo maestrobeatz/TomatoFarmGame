@@ -1,0 +1,145 @@
+.farms-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: #333; /* Add this line to set the default text color */
+}
+
+.farms-section h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.nft-display-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.nft-display {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: #333; /* Add this line to ensure text is visible */
+}
+
+.nft-details {
+    margin-bottom: 10px;
+}
+
+.nft-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.nft-image:hover {
+    transform: scale(1.05);
+}
+
+.nft-info {
+    margin-top: 10px;
+}
+
+.nft-info p {
+    margin: 5px 0;
+    color: #333; /* Add this line to ensure text is visible */
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    transition: background-color 0.2s ease-in-out;
+    color: #333; /* Add this line to ensure text is visible */
+}
+
+select:hover {
+    background-color: #e9e9e9;
+}
+
+select:focus {
+    outline: 2px solid #007bff;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+button:disabled {
+    background-color: #dc3545;
+    cursor: not-allowed;
+}
+
+button.action-not-allowed {
+    background-color: #dc3545;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+button:focus {
+    outline: 2px solid #007bff;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 2s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+    color: white;
+    font-weight: bold;
+}
+
+.alert.default {
+    background-color: #28a745;
+}
+
+.alert.destructive {
+    background-color: #dc3545;
+}
+
+@media (max-width: 768px) {
+    .nft-display-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .nft-display {
+        width: 100%;
+    }
+}

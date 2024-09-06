@@ -1,192 +1,102 @@
 .perform-action {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
 }
-.perform-action h2 {
-    margin-bottom: 20px;
-    color: #333;
-}
+
 .nft-display-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
 }
+
 .nft-display {
-    flex: 1;
-    text-align: center;
-    padding: 10px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-.nft-details {
-    margin-bottom: 10px;
-}
-.nft-image {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    transition: transform 0.2s ease-in-out;
-}
-.nft-image:hover {
-    transform: scale(1.05);
-}
-.nft-info {
-    margin-top: 10px;
-}
-.nft-info p {
-    margin: 5px 0;
-}
-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f0f0f0;
-    transition: background-color 0.2s ease-in-out;
-}
-select:hover {
-    background-color: #e9e9e9;
-}
-select:focus {
-    outline: 2px solid #007bff;
-}
-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-}
-button:disabled {
-    background-color: #dc3545;
-    cursor: not-allowed;
-}
-button.action-not-allowed {
-    background-color: #dc3545;
-    cursor: not-allowed;
-}
-button:hover:not(:disabled) {
-    background-color: #0056b3;
-}
-button:focus {
-    outline: 2px solid #007bff;
-}
-.loading-spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #007bff;
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    animation: spin 2s linear infinite;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 10px;
-}
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-.alert {
-    padding: 15px;
-    border-radius: 5px;
-    margin-top: 20px;
-    color: white;
-    font-weight: bold;
-}
-.alert.default {
-    background-color: #28a745;
-}
-.alert.destructive {
-    background-color: #dc3545;
-}
-.progress {
-    height: 8px;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    overflow: hidden;
-    margin-top: 10px;
-}
-.progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #007bff, #0056b3);
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
-    transition: width 0.2s ease-in-out;
-}
-.progress-label {
-    margin-top: 5px;
-    text-align: center;
-    font-size: 0.9em;
-    color: #555;
-}
-.tooltip {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-}
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 140px;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    border-radius: 5px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%; 
-    left: 50%;
-    margin-left: -70px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #fff;
+  max-width: 180px; /* Adjusted size of each box */
+  text-align: center;
+  flex: 1; /* Ensures the box scales properly within the container */
 }
 
-/* New styles for the refill button */
-.refill-button {
-    margin-top: 10px;
-    width: 100%;
-    padding: 8px 16px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
+.nft-display img.nft-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 10px;
+  max-height: 90px; /* Adjusted height of the image */
 }
 
-.refill-button:hover:not(:disabled) {
-    background-color: #45a049;
+.nft-display h3 {
+  font-size: 13px; /* Reduced font size slightly */
+  margin: 10px 0 5px;
 }
 
-.refill-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+.nft-display p {
+  font-size: 11px; /* Reduced font size slightly */
+  margin: 5px 0;
 }
 
-/* Ensure the progress container has enough space for the refill button */
 .progress-container {
-    margin-top: 15px;
-    padding-bottom: 10px;
+  margin-top: 10px;
+}
+
+.progress-label {
+  font-size: 11px; /* Reduced font size slightly */
+  margin-top: 5px;
+}
+
+.refill-button {
+  margin-top: 10px;
+  font-size: 11px; /* Reduced font size slightly */
+  padding: 5px 10px;
+}
+
+.plot-select {
+  margin-bottom: 20px;
+}
+
+.alert {
+  margin-top: 20px;
+}
+
+.perform-action button {
+  width: 50%; /* Reduced the width to 50% */
+  margin: 10px auto;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #4CAF50; /* Green background */
+  color: black !important; /* Black font color */
+  font-weight: bold !important; /* Bold font */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.perform-action button:disabled {
+  background-color: #f44336; /* Red background for disabled buttons */
+  cursor: not-allowed; /* Show not-allowed cursor on disabled buttons */
+}
+
+.perform-action button:hover:not(:disabled) {
+  background-color: #45a049; /* Darker green on hover */
 }
 
 @media (max-width: 768px) {
-    .nft-display-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .nft-display {
-        width: 100%;
-    }
+  .nft-display {
+    max-width: 140px; /* Adjusted container size for mobile */
+  }
+
+  .nft-display img.nft-image {
+    max-height: 70px; /* Adjusted image size on mobile */
+  }
+
+  .perform-action button {
+    width: 80%; /* Ensures button is 80% of container width on mobile for better touch area */
+  }
 }

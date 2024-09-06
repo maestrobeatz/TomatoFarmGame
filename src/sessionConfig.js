@@ -16,7 +16,6 @@ const sessionKit = new SessionKit({
     {
       id: chainId,
       url: rpcEndpoint,
-      chainId: chainId,
       nativeToken: {
         symbol: "WAX",
         precision: 8,
@@ -34,6 +33,44 @@ const sessionKit = new SessionKit({
 export const loginMethods = {
   anchor: WalletPluginAnchor,
   wax: WalletPluginCloudWallet,
+};
+
+export const saveSession = (session) => {
+  try {
+    if (!session) {
+      console.error("Cannot save null or undefined session");
+      return;
+    }
+    const sessionData = JSON.stringify({
+      actor: session.actor?.toString() || null,
+      permission: session.permission || null,
+      chainId: session.chain.id,
+      walletPlugin: session.walletPlugin?.id() || null,
+    });
+    localStorage.setItem('userSession', sessionData);
+  } catch (error) {
+    console.error("Failed to save session:", error);
+  }
+};
+
+export const restoreSession = async () => {
+  try {
+    const session = await sessionKit.restore();
+    return session || null;
+  } catch (error) {
+    console.error("Failed to restore session:", error);
+    return null;
+  }
+};
+
+export const performTransaction = async (session, actionData) => {
+  try {
+    const result = await session.transact({ actions: [actionData] });
+    return result;
+  } catch (error) {
+    console.error("Transaction failed:", error);
+    throw error;
+  }
 };
 
 export default sessionKit;

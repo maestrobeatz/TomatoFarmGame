@@ -1,0 +1,66 @@
+.PlotStatus {
+  width: 100%;
+  max-width: 500px; /* Further reduced max width */
+  margin: 20px auto;
+  padding: 8px; /* Further reduced padding */
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.PlotStatus h2 {
+  color: #4CAF50; /* Tomato green */
+  margin-bottom: 8px; /* Further reduced margin */
+  font-size: 1.3em; /* Further reduced font size */
+}
+
+.pivot-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75em; /* Further reduced font size */
+  text-align: left;
+}
+
+.pivot-table th, .pivot-table td {
+  padding: 4px; /* Further reduced padding */
+  border-bottom: 1px solid #ddd;
+  word-wrap: break-word; /* Ensure text wraps within cells */
+}
+
+.pivot-table th {
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+.pivot-table td {
+  text-align: center;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 8px; /* Further reduced size */
+  height: 8px; /* Further reduced size */
+  border-radius: 50%;
+  background-color: red; /* Default to red */
+}
+
+.status-indicator.green {
+  background-color: #4CAF50; /* Green for success */
+}
+
+.status-indicator.red {
+  background-color: #F44336; /* Red for failure */
+}
+
+/* Responsive adjustments for mobile devices */
+@media (max-width: 480px) {
+  .pivot-table th, .pivot-table td {
+    padding: 2px; /* Further reduce padding on small screens */
+    font-size: 0.65em; /* Further reduce font size */
+  }
+  
+  .status-indicator {
+    width: 6px; /* Further reduce size */
+    height: 6px; /* Further reduce size */
+  }
+}

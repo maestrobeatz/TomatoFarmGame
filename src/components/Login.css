@@ -1,0 +1,74 @@
+/* Basic Container Setup */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto; /* Minimized vertical height */
+  background-color: #e0f7fa;
+  padding: 1px;
+  font-family: 'Arial', sans-serif;
+  color: #333; /* Ensure all text has a dark color for readability */
+  transition: all 0.3s ease; /* Smooth transition for background removal */
+}
+
+/* Styling for buttons */
+.green-button {
+  width: 200px;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  color: black; /* Button text remains white */
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Green button styles */
+.green-button {
+  background-color: #4CAF50;
+}
+
+.green-button:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+/* Style when logged in */
+.logged-in {
+  background-color: transparent; /* Remove background color */
+  height: auto; /* Adjust height to fit content */
+  padding: 0; /* Remove padding */
+  box-shadow: none; /* Remove any container shadow */
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+/* Style for the logout button when logged in */
+.logout-button {
+  background-color: #FF5733; /* Different color for the logout button */
+  margin-top: 0; /* Remove margin */
+  width: auto; /* Adjust width to fit content */
+  padding: 8px 16px; /* Adjust padding */
+}
+
+.logout-button:hover {
+  background-color: #E74C3C;
+}
+
+/* Adding some responsive styling */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 8px;
+  }
+
+  .green-button, .logout-button {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
