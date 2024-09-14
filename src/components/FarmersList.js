@@ -1,22 +1,22 @@
 import React from 'react';
 
-const FarmersList = React.memo(({ farmers }) => {
-  console.log('Rendering FarmersList, farmers:', farmers);
+const FarmersList = ({ farmers }) => {
+  if (farmers.length === 0) {
+    return <p>No farmers registered yet.</p>;
+  }
 
   return (
-    <div className="farmers-list">
-      <h3>Registered Farmers: {farmers.length}</h3>
-      {farmers.length > 0 ? (
-        <ul>
-          {farmers.map(farmer => (
-            <li key={farmer._id}>{farmer.accountName}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>No farmers registered yet.</p>
-      )}
+    <div>
+      <h2>Registered Farmers</h2>
+      <ul>
+        {farmers.map((farmer) => (
+          <li key={farmer._id}>
+            <strong>{farmer.nickname}</strong> (Account: {farmer.accountName}) - Registered on {new Date(farmer.createdAt).toLocaleDateString()}
+          </li>
+        ))}
+      </ul>
     </div>
   );
-});
+};
 
 export default FarmersList;

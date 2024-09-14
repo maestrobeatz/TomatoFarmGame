@@ -18,9 +18,9 @@
   border-radius: 8px;
   padding: 10px;
   background-color: #fff;
-  max-width: 180px; /* Adjusted size of each box */
+  max-width: 180px;
   text-align: center;
-  flex: 1; /* Ensures the box scales properly within the container */
+  flex: 1;
 }
 
 .nft-display img.nft-image {
@@ -28,16 +28,16 @@
   height: auto;
   border-radius: 8px;
   margin-top: 10px;
-  max-height: 90px; /* Adjusted height of the image */
+  max-height: 90px;
 }
 
 .nft-display h3 {
-  font-size: 13px; /* Reduced font size slightly */
+  font-size: 13px;
   margin: 10px 0 5px;
 }
 
 .nft-display p {
-  font-size: 11px; /* Reduced font size slightly */
+  font-size: 11px;
   margin: 5px 0;
 }
 
@@ -46,13 +46,13 @@
 }
 
 .progress-label {
-  font-size: 11px; /* Reduced font size slightly */
+  font-size: 11px;
   margin-top: 5px;
 }
 
 .refill-button {
   margin-top: 10px;
-  font-size: 11px; /* Reduced font size slightly */
+  font-size: 11px;
   padding: 5px 10px;
 }
 
@@ -65,13 +65,13 @@
 }
 
 .perform-action button {
-  width: 50%; /* Reduced the width to 50% */
+  width: 50%;
   margin: 10px auto;
   padding: 10px;
   font-size: 16px;
-  background-color: #4CAF50; /* Green background */
-  color: black !important; /* Black font color */
-  font-weight: bold !important; /* Bold font */
+  background-color: #4CAF50;
+  color: white !important;
+  font-weight: bold !important;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -79,24 +79,25 @@
 }
 
 .perform-action button:disabled {
-  background-color: #f44336; /* Red background for disabled buttons */
-  cursor: not-allowed; /* Show not-allowed cursor on disabled buttons */
+  background-color: #f44336; /* Updated to match the red styling for disabled buttons */
+  color: white; /* Keep the text color white for better contrast */
+  cursor: not-allowed;
 }
 
 .perform-action button:hover:not(:disabled) {
-  background-color: #45a049; /* Darker green on hover */
+  background-color: #45a049;
 }
 
 @media (max-width: 768px) {
   .nft-display {
-    max-width: 140px; /* Adjusted container size for mobile */
+    max-width: 140px;
   }
 
   .nft-display img.nft-image {
-    max-height: 70px; /* Adjusted image size on mobile */
+    max-height: 70px;
   }
 
   .perform-action button {
-    width: 80%; /* Ensures button is 80% of container width on mobile for better touch area */
+    width: 80%;
   }
 }

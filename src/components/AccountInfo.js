@@ -1,47 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { JsonRpc } from 'eosjs';
+import React from 'react';
 import './AccountInfo.css';
 
-const rpc = new JsonRpc(process.env.REACT_APP_RPC);
-
 const AccountInfo = ({ accountInfo }) => {
-  const [balance, setBalance] = useState(null);
-  const [cpuLimit, setCpuLimit] = useState({ used: 0, available: 0, max: 1 });
-  const [loading, setLoading] = useState(true);
+  console.log('Rendering AccountInfo component with:', accountInfo); // Log for debugging
 
-  useEffect(() => {
-    const fetchAccountData = async () => {
-      if (!accountInfo) return;
-
-      setLoading(true);
-      try {
-        const balanceResult = await rpc.get_currency_balance('eosio.token', accountInfo.account_name, 'WAX');
-        setBalance(balanceResult.length > 0 ? balanceResult[0] : '0 WAX');
-
-        const cpuData = accountInfo.cpu_limit || { used: 0, available: 0, max: 1 };
-        setCpuLimit(cpuData);
-        
-      } catch (error) {
-        console.error('Error fetching account data:', error);
-        setBalance('Error fetching balance');
-        setCpuLimit({ used: 0, available: 0, max: 1 });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAccountData();
-  }, [accountInfo]);
-
-  if (!accountInfo) {
+  if (!accountInfo.accountName) {
     return <p>No account information available.</p>;
   }
 
-  if (loading) {
-    return <p>Loading account information...</p>;
-  }
+  const cpuLimit = accountInfo.cpu_limit?.max || 1; // Prevent division by 0
+  const cpuUsed = accountInfo.cpu_limit?.used || 0;
+  const cpuUsagePercentage = (cpuUsed / cpuLimit) * 100;
 
-  const cpuUsagePercentage = (cpuLimit.used / cpuLimit.max) * 100;
   const getCpuStatusColor = (percentage) => {
     if (percentage < 50) return 'green';
     if (percentage < 80) return 'yellow';
@@ -52,21 +22,21 @@ const AccountInfo = ({ accountInfo }) => {
 
   return (
     <div className="AccountInfo">
-      <p><strong>Account Name:</strong> {accountInfo.account_name}</p>
-      <p><strong>Balance:</strong> {balance}</p>
-      {cpuLimit && (
-        <div className="CpuStatus">
-          <h3>CPU Status</h3>
-          <div className="CpuStatusBar">
-            <div className={`CpuStatusFill ${cpuStatusColor}`} style={{ width: `${cpuUsagePercentage}%` }}></div>
-          </div>
-          <div className="CpuRow">
-            <p><strong>Used:</strong> {cpuLimit.used} µs</p>
-            <p><strong>Available:</strong> {cpuLimit.available} µs</p>
-            <p><strong>Max:</strong> {cpuLimit.max} µs</p>
-          </div>
+      <p><strong>Account Name:</strong> {accountInfo.accountName}</p>
+      <p><strong>Balance:</strong> {accountInfo.balance}</p>
+      <p><strong>CPU Stake:</strong> {accountInfo.cpu_stake}</p>
+      <p><strong>Net Stake:</strong> {accountInfo.net_stake}</p>
+      <p><strong>RAM Usage:</strong> {accountInfo.ram_usage} / {accountInfo.ram_quota}</p>
+
+      <div className="CpuStatus">
+        <h3>CPU Status</h3>
+        <div className="CpuStatusBar">
+          <div className={`CpuStatusFill ${cpuStatusColor}`} style={{ width: `${cpuUsagePercentage}%` }}></div>
         </div>
-      )}
+        <div className="CpuRow">
+          <p><strong>CPU Usage:</strong> {cpuUsagePercentage.toFixed(2)}%</p>
+        </div>
+      </div>
     </div>
   );
 };

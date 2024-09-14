@@ -1,48 +1,105 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './Farms.css';
-import { getFarmers, getInventory } from './api';
+import { getFarmsWithPlots } from './api';
 
-const Farms = ({ session }) => {
-    const [farmers, setFarmers] = useState([]);
-    const [inventory, setInventory] = useState([]);
+const Farms = ({ session, performTransaction, fetchData }) => {
+  const [userFarms, setUserFarms] = useState([]);
+  const [allFarms, setAllFarms] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const fetchAccountData = useCallback(async () => {
-        if (!session?.actor) return;
+  const fetchFarmsData = useCallback(async () => {
+    if (!session?.actor) return;
+    setIsLoading(true);
+    try {
+      const farmsData = await getFarmsWithPlots(session.actor.toString());
+      console.log("Fetched farms data:", farmsData);
+      const userFarmsData = farmsData.farms.filter(farm => farm.owner === session.actor.toString());
+      setUserFarms(userFarmsData || []);
+      setAllFarms(farmsData.farms || []);
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching farms data:', error);
+      setError('Error fetching farms data: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [session]);
 
-        try {
-            const farmerData = await getFarmers();
-            setFarmers(farmerData.farmers || []);
+  useEffect(() => {
+    fetchFarmsData();
+  }, [fetchFarmsData]);
 
-            const inventoryData = await getInventory(session.actor);
-            setInventory(inventoryData.items || []);
-        } catch (error) {
-            console.error('Error fetching account data:', error);
-        }
-    }, [session]);
+  const handleStakeUnstake = async (farmId, isStaked) => {
+    const actionName = isStaked ? 'unstakefarm' : 'stakefarm';
+    try {
+      await performTransaction(actionName, {
+        account: process.env.REACT_APP_CONTRACT_NAME,
+        name: actionName,
+        authorization: [{ actor: session.actor.toString(), permission: 'active' }],
+        data: { farm_nft_id: farmId, owner: session.actor.toString() },
+      });
+      await fetchData();
+      await fetchFarmsData(); // Refresh farms data after transaction
+    } catch (error) {
+      console.error(`Error ${isStaked ? 'unstaking' : 'staking'} farm:`, error);
+      setError(`Failed to ${isStaked ? 'unstake' : 'stake'} farm: ` + error.message);
+    }
+  };
 
-    useEffect(() => {
-        fetchAccountData();
-    }, [fetchAccountData]);
-
-    return (
-        <div className="farms">
-            <h3>Farms</h3>
-            <div className="farmers-list">
-                {farmers.map((farmer) => (
-                    <div key={farmer.accountName} className="farmer-card">
-                        <p>Farmer: {farmer.nickname} ({farmer.accountName})</p>
-                    </div>
-                ))}
-            </div>
-            <div className="inventory-list">
-                {inventory.map((item, index) => (
-                    <div key={index} className="inventory-item">
-                        <p>{item.itemName}: {item.quantity}</p>
-                    </div>
-                ))}
-            </div>
+  const renderFarmCard = (farm) => (
+    <div key={farm.farmId} className="farm-card">
+      <p><strong>Farm Name:</strong> {farm.name}</p>
+      <p><strong>Farm ID:</strong> {farm.farmId}</p>
+      <p><strong>Total Plots:</strong> {farm.plots}</p>
+      {farm.plotDetails && farm.plotDetails.length > 0 && (
+        <div>
+          <p><strong>Plots:</strong></p>
+          <ul>
+            {farm.plotDetails.map(plot => (
+              <li key={`${farm.farmId}-${plot.id}`}>
+                Plot ID: {plot.id}, Status: {plot.status}
+              </li>
+            ))}
+          </ul>
         </div>
-    );
+      )}
+      {farm.owner === session.actor.toString() && (
+        <button
+          className="action-button"
+          onClick={() => handleStakeUnstake(farm.farmId, farm.is_staked)}
+        >
+          {farm.is_staked ? 'Unstake Farm' : 'Stake Farm'}
+        </button>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      <h3>Your Farms</h3>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p className="error-message">{error}</p>
+      ) : userFarms.length > 0 ? (
+        <div className="farms-list">
+          {userFarms.map(renderFarmCard)}
+        </div>
+      ) : (
+        <p>You have no farms.</p>
+      )}
+
+      <h3>All Farms in the Game</h3>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="farms-list">
+          {allFarms.map(renderFarmCard)}
+        </div>
+      )}
+    </>
+  );
 };
 
 export default Farms;

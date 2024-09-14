@@ -3,22 +3,22 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #f0f0f0; /* Light grey background */
-    color: black; /* Set default font color to black */
+    background-color: #f0f0f0;
+    color: black;
 }
 
 .App {
     text-align: center;
     max-width: 100%;
     overflow-x: hidden;
-    padding: 20px; /* Add padding for better spacing */
+    padding: 20px;
 }
 
 .App-logo {
-    height: 80px; /* Reduced the size for a more compact logo */
+    height: 80px;
     max-width: 100%;
     object-fit: contain;
-    margin-bottom: 20px; /* Add margin bottom for spacing */
+    margin-bottom: 20px;
 }
 
 .App-header {
@@ -31,23 +31,19 @@ body {
     padding: 20px;
     font-size: calc(10px + 2vmin);
     color: white;
-    border-radius: 10px; /* Add border radius for smooth corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .App-header h1 {
-    color: #FFD700; /* Gold color for better visibility */
-}
-
-.App-link {
-    color: #61dafb;
+    color: #FFD700;
 }
 
 button {
-    background-color: #4CAF50; /* Tomato green background */
+    background-color: #4CAF50;
     border: none;
-    color: white; /* White font color */
-    font-weight: bold; /* Bold font */
+    color: white;
+    font-weight: bold;
     padding: 10px 20px;
     text-align: center;
     text-decoration: none;
@@ -60,7 +56,45 @@ button {
 }
 
 button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #45a049;
+}
+
+.nft-collection-button {
+    background-color: #FFD700;
+    color: black;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.nft-collection-button:hover {
+    background-color: #ffcc00;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.logout-button,
+.unregister-button {
+    background-color: #f44336;
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover,
+.unregister-button:hover {
+    background-color: #d32f2f;
 }
 
 .section {
@@ -72,267 +106,19 @@ button:hover {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
-    color: black; /* Ensure text color is black */
+    color: black;
 }
 
 .section h2 {
-    color: #4CAF50; /* Tomato green */
+    color: #4CAF50;
     margin-bottom: 10px;
-}
-
-/* Styles for PerformAction component */
-.perform-action {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 10px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.perform-action button {
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #4CAF50; /* Tomato green background */
-    color: white; /* White font color */
-    font-weight: bold; /* Bold font */
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.perform-action button:hover {
-    background-color: #45a049; /* Darker green on hover */
-}
-
-input[type="text"], select {
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 400px;
-    font-size: 16px;
-}
-
-input[type="text"]:focus, select:focus {
-    border-color: #4CAF50; /* Tomato green border on focus */
-    outline: none;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Light green shadow */
 }
 
 .error-message {
     color: red;
     margin: 10px 0;
-    padding: 10px; /* Add padding */
-    background-color: #ffe6e6; /* Light red background for emphasis */
-    border: 1px solid red; /* Border to make it stand out */
-    border-radius: 5px; /* Consistent with other elements */
-}
-
-/* Styles for AccountInfo component */
-.AccountInfo {
-    text-align: left;
-    margin-bottom: 20px;
-    background-color: #fff;
     padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    font-size: 0.9em; /* Reduce font size slightly */
-}
-
-.AccountInfo p {
-    margin: 5px 0;
-}
-
-/* CPU Status Bar */
-.CpuStatus {
-    width: 100%;
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 10px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: left;
-}
-
-.CpuStatusBar {
-    width: 100%;
-    background-color: #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 10px;
-}
-
-.CpuStatusFill {
-    height: 20px;
-    transition: width 0.5s ease-in-out;
-}
-
-.CpuStatusFill.green {
-    background-color: #4CAF50; /* Green */
-}
-
-.CpuStatusFill.yellow {
-    background-color: #FFEB3B; /* Yellow */
-}
-
-.CpuStatusFill.red {
-    background-color: #F44336; /* Red */
-}
-
-.CpuRow {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
-
-.CpuRow p {
-    margin: 3px 0;
-    font-size: 0.8em; /* Reduce font size for CPU status */
-    flex: 1;
-    min-width: 100px;
-}
-
-/* Styles for Farms section */
-.farms-section {
-    margin-bottom: 20px;
-    width: 100%;
-    max-width: 600px;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
-    color: black; /* Ensure text color is black */
-}
-
-.farm-item {
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
-}
-
-.farm-item p {
-    margin: 5px 0;
-    font-size: 0.9em;
-}
-
-.farm-item:last-child {
-    border-bottom: none;
-}
-
-/* Styles for Available Farms table */
-.table {
-    width: 90%; /* Adjusted width for smaller table */
-    max-width: 500px; /* Reduced maximum width */
-    margin: 20px auto;
-    border-collapse: collapse;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    font-size: 0.9em; /* Reduced font size */
-}
-
-.table th, .table td {
-    padding: 8px; /* Reduced padding for smaller size */
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.table th {
-    background-color: #4CAF50; /* Tomato green for table header */
-    color: white;
-}
-
-.table td {
-    background-color: white;
-    color: black;
-}
-
-.table tr:hover {
-    background-color: #f1f1f1; /* Light grey hover effect */
-}
-
-.table .farm-name {
-    font-weight: bold;
-    font-size: 0.8em; /* Smaller font size for farm name */
-    color: #4CAF50;
-}
-
-.table .farm-id {
-    font-weight: bold;
-    color: #4CAF50;
-}
-
-.table .action-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 6px 10px; /* Reduced padding for button */
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.table .action-button:hover {
-    background-color: #45a049;
-}
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-    .section {
-        padding: 15px;
-        margin: 15px auto;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .perform-action {
-        padding: 10px;
-    }
-
-    .CpuStatus {
-        padding: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .App-header {
-        padding: 10px;
-    }
-
-    .App-logo {
-        height: 60px;
-    }
-
-    .section {
-        padding: 10px;
-        margin: 10px auto;
-    }
-
-    .perform-action button {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    input[type="text"], select {
-        padding: 8px;
-    }
-
-    .table {
-        width: 100%; /* Full width for smaller screens */
-        font-size: 0.8em; /* Further reduced font size */
-    }
-
-    .table th, .table td {
-        padding: 6px; /* Further reduced padding */
-    }
+    background-color: #ffe6e6;
+    border: 1px solid red;
+    border-radius: 5px;
 }

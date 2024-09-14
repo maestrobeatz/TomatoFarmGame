@@ -12,12 +12,12 @@ const Login = ({ session, login, logout }) => {
   return (
     <div className={`login-container ${session ? 'logged-in' : ''}`}>
       {session ? (
-        <button className="green-button logout-button" onClick={logout}>
+        <button className="logout-button" onClick={logout}>
           LOGOUT
         </button>
       ) : (
         <>
-          <button className="green-button" onClick={login}>
+          <button className="login-button" onClick={login}>
             LOGIN
           </button>
           <button className="blue-button" onClick={handleOnboarding}>

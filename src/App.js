@@ -4,280 +4,164 @@ import sessionKit, { saveSession, restoreSession } from './sessionConfig';
 import ErrorBoundary from './components/ErrorBoundary';
 import logo from './MaestroBeatzLogo.png';
 import AccountInfo from './components/AccountInfo';
-import PerformAction from './components/PerformAction';
 import FarmersList from './components/FarmersList';
 import Login from './components/Login';
 import NFTList from './components/NFTList';
 import PlotStatus from './components/PlotStatus';
-import { getFarmers, registerFarmer, unregisterFarmer } from './components/api';
+import Farms from './components/Farms';
+import PerformAction from './components/PerformAction';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-const FARMSTEAD_TEMPLATE_ID = '654617';
-
-const requiredNFTs = {
-  rhythmCompostSoil: '653267',
-  melodyWateringCan: '653268',
-  beatzTomatoSeeds: '653266',
-};
+import {
+  getFarmers,
+  getFarmsWithPlots,
+  getAccountInfo,
+  getPlots,
+  registerFarmer,
+} from './components/api'; // Ensure registerFarmer is imported
 
 function App() {
   const [session, setSession] = useState(null);
   const [accountInfo, setAccountInfo] = useState(null);
-  const [inventory, setInventory] = useState([]);
   const [farmers, setFarmers] = useState([]);
   const [farms, setFarms] = useState([]);
   const [plots, setPlots] = useState([]);
+  const [isRegistered, setIsRegistered] = useState(false); // Add state to track registration
+  const [selectedAction, setSelectedAction] = useState(''); 
+  const [selectedNFTs, setSelectedNFTs] = useState({}); 
+  const [loadingStates, setLoadingStates] = useState({
+    farmers: false,
+    account: false,
+    farms: false,
+    plots: false,
+  });
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  // Initialize session on component mount
   useEffect(() => {
     const initSession = async () => {
       try {
         const restoredSession = await restoreSession();
         if (restoredSession) {
           setSession(restoredSession);
+          console.log("Session restored: ", restoredSession);
         }
       } catch (err) {
+        console.error("Failed to restore session:", err);
         setError('Failed to restore session: ' + err.message);
       }
     };
     initSession();
   }, []);
 
-  const fetchData = useCallback(async () => {
-    if (!session || !session.actor) return;
-    setIsLoading(true);
+  // Fetch registered farmers list
+  const fetchFarmersList = useCallback(async () => {
+    setLoadingStates((prev) => ({ ...prev, farmers: true }));
     try {
-      const [farmersData, accountInfoData, farmsData, inventoryData, plotsData] = await Promise.all([
-        getFarmers(),
-        fetch(`${API_BASE_URL}/account/${session.actor.toString()}`).then(res => res.json()),
-        fetch(`${API_BASE_URL}/farms-with-plots`).then(res => res.json()),
-        fetch(`${API_BASE_URL}/nfts/${session.actor.toString()}`).then(res => res.json()),
-        fetch(`${API_BASE_URL}/plots/${session.actor.toString()}`),
-      ]);
-
+      const farmersData = await getFarmers();
       setFarmers(farmersData.farmers || []);
-      setAccountInfo(accountInfoData);
-      setFarms(farmsData.farms || []);
-      setInventory(inventoryData.nfts || []);
-
-      if (plotsData.ok) {
-        const plotsJson = await plotsData.json();
-        setPlots(plotsJson.plots || []);
-      } else if (plotsData.status === 404) {
-        setError('No plots found. You can create a farm to start.');
-        setPlots([]);
-      } else {
-        throw new Error(`Failed to fetch plot data: ${plotsData.statusText}`);
-      }
-
-      const farmer = farmersData.farmers.find(farmer => farmer.accountName === session.actor.toString());
-      setIsRegistered(!!farmer);
-      setError(null);
+      const isUserRegistered = farmersData.farmers.some(farmer => farmer.accountName === session.actor.toString());
+      setIsRegistered(isUserRegistered); // Check if the user is registered
     } catch (err) {
-      setError('Failed to fetch data: ' + err.message);
+      console.error("Error fetching farmers:", err);
     } finally {
-      setIsLoading(false);
+      setLoadingStates((prev) => ({ ...prev, farmers: false }));
     }
   }, [session]);
 
+  // Fetch user-specific data (account info, farms, plots)
+  const fetchUserData = useCallback(async () => {
+    if (!session || !session.actor) return;
+    const accountName = session.actor.toString();
+
+    // Fetch Account Info
+    setLoadingStates((prev) => ({ ...prev, account: true }));
+    try {
+      const accountInfoData = await getAccountInfo(accountName);
+      setAccountInfo(accountInfoData || {
+        accountName: 'Unknown',
+        balance: '0.0000 WAX',
+        cpu_stake: 'N/A',
+        net_stake: 'N/A',
+        ram_usage: 0,
+        ram_quota: 0,
+        cpu_limit: { used: 0, max: 1 }
+      });
+    } catch (err) {
+      console.error("Error fetching account info:", err);
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, account: false }));
+    }
+
+    // Fetch Farms and Plots
+    setLoadingStates((prev) => ({ ...prev, farms: true, plots: true }));
+    try {
+      const farmsData = await getFarmsWithPlots(accountName);
+      const plotsData = await getPlots(accountName);
+      setFarms(farmsData.farms || []);
+      setPlots(plotsData.message === 'No plots found for this user.' ? [] : (plotsData.plots || []));
+    } catch (err) {
+      console.error("Error fetching farms/plots data:", err);
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, farms: false, plots: false }));
+    }
+  }, [session]);
+
+  // Refetch data when session changes
   useEffect(() => {
     if (session && session.actor) {
-      fetchData();
+      fetchUserData();
     }
-  }, [session, fetchData]);
+    fetchFarmersList();
+  }, [session, fetchUserData, fetchFarmersList]);
 
+  // Handle login
   const handleLogin = async () => {
     try {
       const result = await sessionKit.login();
-      if (!result || !result.session) {
-        throw new Error('Login failed: No valid session returned');
-      }
       const newSession = result.session;
-      if (!newSession.actor) {
-        throw new Error('Login failed: No actor in session');
-      }
       setSession(newSession);
       saveSession(newSession);
-      await fetchData();
+      await fetchUserData();
     } catch (err) {
-      setError('Error during login: ' + err.message);
+      console.error("Error during login:", err);
     }
   };
 
+  // Handle logout
   const handleLogout = async () => {
     if (session) {
       try {
         await sessionKit.logout(session);
         setSession(null);
         setAccountInfo(null);
-        setInventory([]);
         setFarmers([]);
         setFarms([]);
         setPlots([]);
         setIsRegistered(false);
         localStorage.removeItem('userSession');
       } catch (err) {
-        setError('Error during logout: ' + err.message);
+        console.error("Error during logout:", err);
       }
     }
   };
 
-  const performTransaction = async (actionName, actionData) => {
-    try {
-      console.log('Sending action data:', actionData);
-      const result = await session.transact({
-        actions: [actionData],
-      });
-      console.log(`${actionName} transaction result:`, result);
-      
-      // Send the action data to the backend
-      const response = await fetch(`${API_BASE_URL}/${actionName}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...actionData.data,
-          transactionId: result.transactionId,
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to process transaction on backend');
-      }
-      
-      const data = await response.json();
-      console.log('Backend response:', data);
-
-      return data;
-    } catch (error) {
-      console.error(`Error performing ${actionName} action`, error);
-      setError(`Failed to perform action ${actionName}: ${error.message}`);
-      throw error;
-    }
-  };
-
+  // Handle Register Farmer
   const handleRegisterFarmer = async () => {
-    if (!session || !session.actor) {
-      setError('Please login first');
-      return;
-    }
+    if (!session || !session.actor) return;
     try {
-      const nickname = isRegistered ? null : prompt('Enter a nickname (max 12 characters):');
-      if (!nickname && !isRegistered) {
-        setError('Nickname is required and must be 12 characters or less.');
+      const username = prompt('Enter a username (max 12 characters):');
+      if (!username || username.length > 12) {
+        alert('Username must be 12 characters or less.');
         return;
       }
-
-      const actionName = isRegistered ? 'unregfarmer' : 'regfarmer';
-      const actionData = {
-        account: process.env.REACT_APP_CONTRACT_NAME,
-        name: actionName,
-        authorization: [{ actor: session.actor.toString(), permission: 'active' }],
-        data: {
-          user: session.actor.toString(),
-          nickname: nickname,
-        }
-      };
-
-      const result = await performTransaction(actionName, actionData);
-
-      if (isRegistered) {
-        await unregisterFarmer(session.actor.toString(), result.transactionId);
-        setIsRegistered(false);
-      } else {
-        await registerFarmer(session.actor.toString(), nickname, result.transactionId);
-        setIsRegistered(true);
-      }
-
-      await fetchData();
+      await registerFarmer(session.actor.toString(), username); // API call to register the farmer
+      setIsRegistered(true); // Update the state after successful registration
+      alert('Farmer registered successfully!');
     } catch (err) {
-      setError(`Failed to ${isRegistered ? 'unregister' : 'register'} farmer: ${err.message}`);
+      console.error("Error registering farmer:", err);
+      alert('Error registering farmer.');
     }
   };
-
-  const handleCreateFarm = async () => {
-    if (!session || !session.actor) {
-      setError('Please login first');
-      return;
-    }
-    try {
-      const farmName = prompt('Enter a name for your farm:');
-      if (!farmName) {
-        setError('Farm name is required.');
-        return;
-      }
-
-      const farmNft = inventory.find(nft => nft.template.template_id === FARMSTEAD_TEMPLATE_ID && !farms.some(farm => farm.farm_nft_id === nft.asset_id));
-      if (!farmNft) {
-        setError('You do not own a valid farm NFT or the NFT has already been used to create a farm.');
-        return;
-      }
-
-      const actionData = {
-        account: process.env.REACT_APP_CONTRACT_NAME,
-        name: 'createfarm',
-        authorization: [{ actor: session.actor.toString(), permission: 'active' }],
-        data: {
-          owner: session.actor.toString(),
-          farm_nft_id: farmNft.asset_id,
-          farm_name: farmName
-        },
-      };
-
-      await performTransaction('createfarm', actionData);
-      await fetchData();
-    } catch (err) {
-      setError('Failed to create farm: ' + err.message);
-    }
-  };
-
-  const handleStakeFarm = async (farmNftId) => {
-    try {
-      const actionData = {
-        account: process.env.REACT_APP_CONTRACT_NAME,
-        name: 'stakefarm',
-        authorization: [{ actor: session.actor.toString(), permission: 'active' }],
-        data: {
-          owner: session.actor.toString(),
-          farm_nft_id: farmNftId,
-        },
-      };
-
-      await performTransaction('stakefarm', actionData);
-      await fetchData();
-    } catch (err) {
-      setError('Failed to stake farm: ' + err.message);
-    }
-  };
-
-  const handleUnstakeFarm = async (farmNftId) => {
-    try {
-      const actionData = {
-        account: process.env.REACT_APP_CONTRACT_NAME,
-        name: 'unstakefarm',
-        authorization: [{ actor: session.actor.toString(), permission: 'active' }],
-        data: {
-          owner: session.actor.toString(),
-          farm_nft_id: farmNftId,
-        },
-      };
-
-      await performTransaction('unstakefarm', actionData);
-      await fetchData();
-    } catch (err) {
-      setError('Failed to unstake farm: ' + err.message);
-    }
-  };
-
-  const handleActionComplete = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
-
-  const actions = ['plantseeds', 'waterplants', 'harvest', 'sellcrops'];
 
   return (
     <ErrorBoundary>
@@ -285,129 +169,58 @@ function App() {
         <header className="App-header">
           <h1>Welcome to {process.env.REACT_APP_SITE_TITLE}</h1>
           <img src={logo} className="App-logo" alt="logo" />
-          <div className="button-group">
-            <Login session={session} login={handleLogin} logout={handleLogout} />
-            {session && inventory.some(nft => nft.template.template_id === FARMSTEAD_TEMPLATE_ID && !farms.some(farm => farm.farm_nft_id === nft.asset_id)) && (
-              <button onClick={handleCreateFarm}>Create Farm</button>
-            )}
-            {session && (
-              <button onClick={handleRegisterFarmer}>
-                {isRegistered ? 'Unregister' : 'Register as Farmer'}
-              </button>
-            )}
-          </div>
-          {isLoading && <p>Loading...</p>}
-          {error && <p className="error-message">{error}</p>}
-          {session && accountInfo && (
+          <a href="https://test.neftyblocks.com/collection/maestrobeatz" target="_blank" rel="noopener noreferrer">
+            <button className="nft-collection-button">View NFT Collection</button>
+          </a>
+          {session && (
+            <div className="action-buttons">
+              <button onClick={handleLogout} className="logout-button">Logout</button>
+              {!isRegistered && (
+                <button onClick={handleRegisterFarmer} className="register-button">
+                  Register as Farmer
+                </button>
+              )}
+            </div>
+          )}
+          {!session && <Login session={session} login={handleLogin} />}
+          {loadingStates.account && <p>Loading account info...</p>}
+          {session && (
             <>
               <div className="section">
                 <h2>Account Information</h2>
-                <AccountInfo accountInfo={accountInfo} />
+                <AccountInfo accountInfo={accountInfo || {}} />
               </div>
-              {inventory.some(nft => nft.template.template_id === FARMSTEAD_TEMPLATE_ID) && (
-                <div className="section">
-                  <h2>Farms</h2>
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th>Farm ID</th>
-                        <th>Farm Name</th>
-                        <th>Available Plots</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {farms
-                        .filter(farm => farm.owner === session.actor.toString())  // Only show the user's farms
-                        .map(farm => (
-                          <tr key={farm.farm_nft_id}>
-                            <td>{farm.farm_nft_id}</td>
-                            <td>{farm.farm_name}</td>
-                            <td>{farm.available_plots}</td>
-                            <td>
-                              <button onClick={() => handleStakeFarm(farm.farm_nft_id)}>Stake Farm</button>
-                              <button onClick={() => handleUnstakeFarm(farm.farm_nft_id)}>Unstake Farm</button>
-                            </td>
-                          </tr>
-                        ))}
-                      {farms.length === 0 && (
-                        <tr>
-                          <td colSpan="4">You have no farms.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
               <div className="section">
-                <h2>Available Farms</h2>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Farm ID</th>
-                      <th>Farm Name</th>
-                      <th>Plot ID</th>
-                      <th>Plot Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {farms
-                      .filter(farm => farm.is_staked)  // Only show staked farms
-                      .map(farm =>
-                        farm.plots.map(plot => (
-                          <tr key={plot.plot_id}>
-                            <td>{farm.farm_nft_id}</td>
-                            <td>{farm.farm_name}</td>
-                            <td>{plot.plot_id}</td>
-                            <td>{plot.user === session.actor.toString() ? 'Owned' : 'Not Owned'}</td>
-                            <td>
-                              {plot.user === session.actor.toString() ? (
-                                <button onClick={() => handleActionComplete(plot.plot_id)}>Perform Action</button>
-                              ) : (
-                                <span>Not available</span>
-                              )}
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                  </tbody>
-                </table>
+                <h2>Farms</h2>
+                <Farms session={session} farms={farms} plots={plots} />
               </div>
               <div className="section">
                 <h2>Your Plot Status</h2>
-                <PlotStatus session={session} refreshTrigger={refreshTrigger} />
+                <PlotStatus session={session} plots={plots} />
               </div>
               <div className="section">
-                <h2>Your Actions</h2>
-                <div className="actions-grid">
-                  {actions.map(action => (
-                    <PerformAction
-                      key={action}
-                      session={session}
-                      action={action}
-                      requiredNFTs={requiredNFTs}
-                      onActionComplete={handleActionComplete}
-                    />
-                  ))}
+                <h2>Your NFTs</h2>
+                <NFTList actor={session.actor.toString()} />
+              </div>
+              <div className="section">
+                <h2>Choose Action</h2>
+                {/* Buttons to select the action */}
+                <div className="action-buttons">
+                  <button onClick={() => setSelectedAction('plantseeds')}>Plant Seeds</button>
+                  <button onClick={() => setSelectedAction('waterplants')}>Water Plants</button>
+                  <button onClick={() => setSelectedAction('harvest')}>Harvest Crops</button>
+                  <button onClick={() => setSelectedAction('sellcrops')}>Sell Crops</button>
+                  <button onClick={() => setSelectedAction('refillcan')}>Refill Watering Can</button>
                 </div>
+                <PerformAction session={session} action={selectedAction} userPlots={plots} selectedNFTs={selectedNFTs} setSelectedNFTs={setSelectedNFTs} />
               </div>
             </>
           )}
         </header>
-        {session && session.actor && (
-          <>
-            <div className="section">
-              <h2>Registered Farmers</h2>
-              <p>Total Farmers: {farmers.length}</p>
-              <FarmersList farmers={farmers} />
-            </div>
-            <div className="section">
-              <h2>Your NFTs</h2>
-              <NFTList actor={session.actor.toString()} />
-            </div>
-          </>
-        )}
+        <div className="section">
+          <h2>Registered Farmers</h2>
+          <FarmersList farmers={farmers} />
+        </div>
       </div>
     </ErrorBoundary>
   );

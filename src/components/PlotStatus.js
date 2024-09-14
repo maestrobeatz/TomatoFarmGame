@@ -16,11 +16,14 @@ const PlotStatus = ({ session, refreshTrigger }) => {
             const response = await fetch(`${API_BASE_URL}/plots/${session.actor}`);
             if (!response.ok) {
                 if (response.status === 404) {
-                    throw new Error('You don\'t have any planted plots.');
+                    // Friendly message if no plots are found
+                    setPlotStatus([]); // Set plots as empty
+                    return; // Do not throw an error, handle the message in UI
                 } else {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
             }
+
             const data = await response.json();
 
             // Fetch Issue Numbers for Locked NFTs
@@ -56,7 +59,7 @@ const PlotStatus = ({ session, refreshTrigger }) => {
     }
 
     if (error) {
-        return <p className="error-message">{error === 'You don\'t have any planted plots.' ? error : "An error occurred. Please try again."}</p>;
+        return <p className="error-message">An error occurred: {error}</p>;
     }
 
     return (
@@ -88,7 +91,7 @@ const PlotStatus = ({ session, refreshTrigger }) => {
                     </tbody>
                 </table>
             ) : (
-                <p>You don't have any planted plots.</p>
+                <p>You don't have any planted plots yet. Get started by planting your first seed!</p> // Friendly message when no plots are found
             )}
         </div>
     );

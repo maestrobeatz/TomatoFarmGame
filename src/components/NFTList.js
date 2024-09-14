@@ -9,16 +9,27 @@ const NFTList = ({ actor }) => {
   const [selectedNFT, setSelectedNFT] = useState(null);
   const [selectedName, setSelectedName] = useState('');
 
+  // Log the received actor
   useEffect(() => {
+    console.log('Actor received in NFTList:', actor); // Log actor
+
     const fetchNFTs = async () => {
+      if (!actor) {
+        setError('Actor is not defined');
+        return;
+      }
+
       setLoading(true);
       setError(null); // Reset error state
+
       try {
         const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/nfts/${actor}`);
+        console.log('API Call URL:', `${process.env.REACT_APP_API_BASE_URL}/nfts/${actor}`); // Log API call
         if (!response.ok) {
           throw new Error(`Error fetching NFTs: ${response.statusText}`);
         }
         const data = await response.json();
+        console.log('NFT Data Received:', data); // Log the received data
         if (data && Array.isArray(data.nfts)) {
           setNfts(data.nfts);
         } else {
@@ -53,7 +64,7 @@ const NFTList = ({ actor }) => {
     return acc;
   }, {});
 
-  const filteredNFTs = Object.values(groupedNFTs).filter(nft => 
+  const filteredNFTs = Object.values(groupedNFTs).filter(nft =>
     selectedName === '' || nft.data.name === selectedName
   );
 
@@ -96,3 +107,4 @@ const NFTList = ({ actor }) => {
 };
 
 export default NFTList;
+
