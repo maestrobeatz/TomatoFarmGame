@@ -75,8 +75,10 @@ button:hover {
 
 .action-buttons {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-top: 10px;
+    justify-content: center;
 }
 
 .logout-button,
@@ -121,4 +123,54 @@ button:hover {
     background-color: #ffe6e6;
     border: 1px solid red;
     border-radius: 5px;
+}
+
+/* Media queries for mobile responsiveness */
+@media (max-width: 768px) {
+    .App-header {
+        padding: 10px;
+        font-size: calc(10px + 1vmin);
+    }
+
+    .App-logo {
+        height: 60px;
+        margin-bottom: 15px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        font-size: 14px;
+    }
+
+    .section {
+        width: 90%;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .App-header h1 {
+        font-size: 24px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .App-logo {
+        height: 50px;
+    }
+
+    .nft-collection-button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
 }

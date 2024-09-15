@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './Farms.css';
 import { getFarmsWithPlots } from './api';
 
-const Farms = ({ session, performTransaction, fetchData }) => {
+const Farms = ({ session, fetchData }) => {
   const [userFarms, setUserFarms] = useState([]);
   const [allFarms, setAllFarms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,16 +30,36 @@ const Farms = ({ session, performTransaction, fetchData }) => {
     fetchFarmsData();
   }, [fetchFarmsData]);
 
+  const performTransaction = async (actionName, actionData) => {
+    try {
+      const result = await session.transact({
+        actions: [{
+          account: process.env.REACT_APP_CONTRACT_NAME,
+          name: actionName,
+          authorization: [{
+            actor: session.actor.toString(),
+            permission: 'active'
+          }],
+          data: actionData
+        }]
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+      });
+      console.log('Transaction successful:', result);
+    } catch (error) {
+      console.error('Transaction failed:', error);
+    }
+  };
+
   const handleStakeUnstake = async (farmId, isStaked) => {
     const actionName = isStaked ? 'unstakefarm' : 'stakefarm';
     try {
       await performTransaction(actionName, {
-        account: process.env.REACT_APP_CONTRACT_NAME,
-        name: actionName,
-        authorization: [{ actor: session.actor.toString(), permission: 'active' }],
-        data: { farm_nft_id: farmId, owner: session.actor.toString() },
+        farm_nft_id: farmId,
+        owner: session.actor.toString(),
       });
-      await fetchData();
+      await fetchData(); // Refresh global data after the transaction
       await fetchFarmsData(); // Refresh farms data after transaction
     } catch (error) {
       console.error(`Error ${isStaked ? 'unstaking' : 'staking'} farm:`, error);
@@ -47,24 +67,13 @@ const Farms = ({ session, performTransaction, fetchData }) => {
     }
   };
 
-  const renderFarmCard = (farm) => (
+  const renderFarmCard = (farm, isUserFarm) => (
     <div key={farm.farmId} className="farm-card">
       <p><strong>Farm Name:</strong> {farm.name}</p>
       <p><strong>Farm ID:</strong> {farm.farmId}</p>
       <p><strong>Total Plots:</strong> {farm.plots}</p>
-      {farm.plotDetails && farm.plotDetails.length > 0 && (
-        <div>
-          <p><strong>Plots:</strong></p>
-          <ul>
-            {farm.plotDetails.map(plot => (
-              <li key={`${farm.farmId}-${plot.id}`}>
-                Plot ID: {plot.id}, Status: {plot.status}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {farm.owner === session.actor.toString() && (
+      {/* Only render the Stake/Unstake button for the user's farms */}
+      {isUserFarm && (
         <button
           className="action-button"
           onClick={() => handleStakeUnstake(farm.farmId, farm.is_staked)}
@@ -84,7 +93,7 @@ const Farms = ({ session, performTransaction, fetchData }) => {
         <p className="error-message">{error}</p>
       ) : userFarms.length > 0 ? (
         <div className="farms-list">
-          {userFarms.map(renderFarmCard)}
+          {userFarms.map(farm => renderFarmCard(farm, true))} {/* Render with Stake/Unstake */}
         </div>
       ) : (
         <p>You have no farms.</p>
@@ -95,7 +104,7 @@ const Farms = ({ session, performTransaction, fetchData }) => {
         <p>Loading...</p>
       ) : (
         <div className="farms-list">
-          {allFarms.map(renderFarmCard)}
+          {allFarms.map(farm => renderFarmCard(farm, false))} {/* No Stake/Unstake here */}
         </div>
       )}
     </>
