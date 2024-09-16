@@ -1,26 +1,47 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './Farms.css';
-import { getFarmsWithPlots } from './api';
+import { getFarmsWithPlots, getNFTStatus } from './api'; // Add getNFTStatus to check staking status
 
-const Farms = ({ session, fetchData }) => {
+const Farms = ({ session }) => {
   const [userFarms, setUserFarms] = useState([]);
   const [allFarms, setAllFarms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Fetch farms data and check staking status for each farm
   const fetchFarmsData = useCallback(async () => {
     if (!session?.actor) return;
     setIsLoading(true);
     try {
       const farmsData = await getFarmsWithPlots(session.actor.toString());
       console.log("Fetched farms data:", farmsData);
-      const userFarmsData = farmsData.farms.filter(farm => farm.owner === session.actor.toString());
+
+      // Check staking status for each farm but handle errors gracefully
+      const userFarmsData = await Promise.all(
+        farmsData.farms.map(async (farm) => {
+          try {
+            const farmStatus = await getNFTStatus(farm.farmId); // Assuming getNFTStatus checks if farm is staked
+            return {
+              ...farm,
+              is_staked: farmStatus.is_staked, // Add staking status to farm data
+            };
+          } catch (err) {
+            console.error(`Failed to fetch staking status for farm ${farm.farmId}:`, err);
+            return {
+              ...farm,
+              is_staked: false, // Default to not staked if error occurs
+            };
+          }
+        })
+      );
+
       setUserFarms(userFarmsData || []);
       setAllFarms(farmsData.farms || []);
-      setError(null);
+      setError(null); // Reset error if data is fetched successfully
     } catch (error) {
       console.error('Error fetching farms data:', error);
-      setError('Error fetching farms data: ' + error.message);
+      // Don't prevent rendering farms if there is an error
+      setError('Error fetching some farm data, but farms will be displayed.');
     } finally {
       setIsLoading(false);
     }
@@ -38,15 +59,16 @@ const Farms = ({ session, fetchData }) => {
           name: actionName,
           authorization: [{
             actor: session.actor.toString(),
-            permission: 'active'
+            permission: 'active',
           }],
-          data: actionData
-        }]
+          data: actionData,
+        }],
       }, {
         blocksBehind: 3,
         expireSeconds: 30,
       });
       console.log('Transaction successful:', result);
+      await fetchFarmsData(); // Refresh farms data after transaction
     } catch (error) {
       console.error('Transaction failed:', error);
     }
@@ -59,7 +81,6 @@ const Farms = ({ session, fetchData }) => {
         farm_nft_id: farmId,
         owner: session.actor.toString(),
       });
-      await fetchData(); // Refresh global data after the transaction
       await fetchFarmsData(); // Refresh farms data after transaction
     } catch (error) {
       console.error(`Error ${isStaked ? 'unstaking' : 'staking'} farm:`, error);
@@ -89,14 +110,17 @@ const Farms = ({ session, fetchData }) => {
       <h3>Your Farms</h3>
       {isLoading ? (
         <p>Loading...</p>
-      ) : error ? (
-        <p className="error-message">{error}</p>
-      ) : userFarms.length > 0 ? (
-        <div className="farms-list">
-          {userFarms.map(farm => renderFarmCard(farm, true))} {/* Render with Stake/Unstake */}
-        </div>
       ) : (
-        <p>You have no farms.</p>
+        <>
+          {error && <p className="error-message">{error}</p>} {/* Display the error, but continue rendering */}
+          {userFarms.length > 0 ? (
+            <div className="farms-list">
+              {userFarms.map(farm => renderFarmCard(farm, true))} {/* Render with Stake/Unstake */}
+            </div>
+          ) : (
+            <p>You have no farms.</p>
+          )}
+        </>
       )}
 
       <h3>All Farms in the Game</h3>

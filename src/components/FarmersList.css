@@ -1,0 +1,33 @@
+/* FarmersList.css */
+.farmers-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.farmer-item {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.farmer-item:hover {
+  background-color: #f1f1f1;
+}
+
+.farmer-name {
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.farmer-username {
+  font-size: 0.9em;
+  color: #777;
+  margin-left: 10px;
+}

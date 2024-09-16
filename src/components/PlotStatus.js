@@ -13,12 +13,12 @@ const PlotStatus = ({ session, refreshTrigger }) => {
 
         setLoading(true);
         try {
+            // Fetching plots for the user
             const response = await fetch(`${API_BASE_URL}/plots/${session.actor}`);
             if (!response.ok) {
                 if (response.status === 404) {
-                    // Friendly message if no plots are found
-                    setPlotStatus([]); // Set plots as empty
-                    return; // Do not throw an error, handle the message in UI
+                    setPlotStatus([]); // No plots found, return empty array
+                    return;
                 } else {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -26,10 +26,20 @@ const PlotStatus = ({ session, refreshTrigger }) => {
 
             const data = await response.json();
 
-            // Fetch Issue Numbers for Locked NFTs
+            // Fetching the NFTs associated with the user
             const nftsResponse = await fetch(`${API_BASE_URL}/nfts/${session.actor}`);
+            if (!nftsResponse.ok) {
+                throw new Error(`Failed to fetch NFTs. Status: ${nftsResponse.status}`);
+            }
+
             const nftsData = await nftsResponse.json();
 
+            // Check if the response contains the expected `nfts` array
+            if (!nftsData || !nftsData.nfts) {
+                throw new Error("NFTs data is unavailable or malformed.");
+            }
+
+            // Update plot data with corresponding NFT issue numbers
             const updatedPlots = data.plots.map(plot => {
                 const seedNFT = nftsData.nfts.find(nft => nft.asset_id === plot.locked_nft_id);
                 const compostNFT = nftsData.nfts.find(nft => nft.asset_id === plot.locked_compost_nft_id);
@@ -45,6 +55,7 @@ const PlotStatus = ({ session, refreshTrigger }) => {
             setError(null);
         } catch (error) {
             setError(error.message);
+            console.error("Error fetching plot status or NFTs:", error);
         } finally {
             setLoading(false);
         }

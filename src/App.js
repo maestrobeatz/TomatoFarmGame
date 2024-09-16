@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
-import useSession from './hooks/useSession'; // Importing the useSession hook
+import useSession from './hooks/useSession';
 import ErrorBoundary from './components/ErrorBoundary';
 import logo from './MaestroBeatzLogo.png';
 import AccountInfo from './components/AccountInfo';
@@ -17,27 +17,30 @@ import {
   getAccountInfo,
   getPlots,
   registerFarmer,
+  getUsername,
+  createUsername,
 } from './components/api';
 
 function App() {
-  const { session, handleLogin, handleLogout } = useSession(); // Using the useSession hook
+  const { session, handleLogin, handleLogout } = useSession();
   const [accountInfo, setAccountInfo] = useState(null);
   const [farmers, setFarmers] = useState([]);
   const [farms, setFarms] = useState([]);
   const [plots, setPlots] = useState([]);
   const [isRegistered, setIsRegistered] = useState(false);
-  const [selectedAction, setSelectedAction] = useState('plantseeds'); // Default action set to 'plantseeds'
-  const [selectedNFTs, setSelectedNFTs] = useState({}); // Initialize selectedNFTs as an empty object
+  const [selectedAction, setSelectedAction] = useState('plantseeds');
+  const [selectedNFTs, setSelectedNFTs] = useState({});
   const [loadingStates, setLoadingStates] = useState({
     farmers: false,
     account: false,
     farms: false,
     plots: false,
   });
+  const [username, setUsername] = useState(null);
+  const [newUsername, setNewUsername] = useState('');
 
   // Fetch registered farmers list
   const fetchFarmersList = useCallback(async () => {
-    if (farmers.length > 0) return; // Avoid re-fetching if farmers data is already loaded
     setLoadingStates((prev) => ({ ...prev, farmers: true }));
     try {
       const farmersData = await getFarmers();
@@ -47,14 +50,25 @@ function App() {
     } finally {
       setLoadingStates((prev) => ({ ...prev, farmers: false }));
     }
-  }, [farmers]);
+  }, []);
+
+  // Fetch username after user logs in
+  const fetchUsername = useCallback(async () => {
+    if (session && session.actor) {
+      try {
+        const fetchedUsername = await getUsername(session.actor.toString());
+        setUsername(fetchedUsername?.username || null);
+      } catch (err) {
+        console.error("Error fetching username:", err);
+      }
+    }
+  }, [session]);
 
   // Fetch user-specific data (account info, farms, plots)
   const fetchUserData = useCallback(async () => {
     if (!session || !session.actor) return;
     const accountName = session.actor.toString();
 
-    // Fetch Account Info
     setLoadingStates((prev) => ({ ...prev, account: true }));
     try {
       const accountInfoData = await getAccountInfo(accountName);
@@ -73,7 +87,6 @@ function App() {
       setLoadingStates((prev) => ({ ...prev, account: false }));
     }
 
-    // Fetch Farms
     setLoadingStates((prev) => ({ ...prev, farms: true }));
     try {
       const farmsData = await getFarmsWithPlots(accountName);
@@ -84,7 +97,6 @@ function App() {
       setLoadingStates((prev) => ({ ...prev, farms: false }));
     }
 
-    // Fetch Plots
     setLoadingStates((prev) => ({ ...prev, plots: true }));
     try {
       const plotsData = await getPlots(accountName);
@@ -96,26 +108,45 @@ function App() {
     }
   }, [session]);
 
-  // Refetch data when session changes
   useEffect(() => {
     if (session && session.actor) {
       fetchUserData();
+      fetchUsername();
     }
     fetchFarmersList();
-  }, [session, fetchUserData, fetchFarmersList]); // Added fetchFarmersList and fetchUserData as dependencies
+  }, [session, fetchUserData, fetchFarmersList, fetchUsername]);
 
   // Handle register as farmer
   const handleRegisterFarmer = async () => {
     if (!session || !session.actor) {
+      console.error("Session is not available or user is not logged in");
       return;
     }
 
     try {
-      const result = await registerFarmer(session.actor.toString(), 'Nickname');
+      const result = await registerFarmer(session.actor.toString(), 'Nickname', session);
       console.log('Register farmer result:', result);
       setIsRegistered(true);
+      await fetchFarmersList(); // Refresh the farmers list after registration
     } catch (err) {
       console.error("Failed to register farmer:", err);
+    }
+  };
+
+  // Handle username creation
+  const handleCreateUsername = async () => {
+    if (!newUsername || !session || !session.actor) {
+      console.error("Invalid username or session");
+      return;
+    }
+
+    try {
+      await createUsername(session.actor.toString(), newUsername);
+      setUsername(newUsername);
+      setNewUsername('');  // Clear the input field after creation
+      await fetchFarmersList();  // Refresh farmers list to show updated username
+    } catch (err) {
+      console.error("Failed to create username:", err);
     }
   };
 
@@ -140,6 +171,19 @@ function App() {
                 <button onClick={handleRegisterFarmer} className="register-button">
                   Register as Farmer
                 </button>
+              )}
+              {!username && (
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Enter username"
+                    value={newUsername}
+                    onChange={(e) => setNewUsername(e.target.value)}
+                  />
+                  <button onClick={handleCreateUsername} className="create-username-button">
+                    Create Username
+                  </button>
+                </div>
               )}
             </div>
           )}

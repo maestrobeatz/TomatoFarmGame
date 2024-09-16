@@ -17,6 +17,28 @@ const handleApiError = (error, context) => {
   throw error;
 };
 
+export const getUsername = async (accountName) => {
+  try {
+    console.log(`Fetching username for account: ${accountName}`);
+    const response = await axios.get(`${API_BASE_URL}/usernames/${accountName}`);
+    console.log('Username received:', response.data);
+    return response.data;
+  } catch (error) {
+    handleApiError(error, 'fetching username');
+  }
+};
+
+export const createUsername = async (accountName, username) => {
+  try {
+    console.log('Creating username:', { accountName, username });
+    const response = await axios.post(`${API_BASE_URL}/usernames`, { accountName, username });
+    console.log('Username created:', response.data);
+    return response.data;
+  } catch (error) {
+    handleApiError(error, 'creating username');
+  }
+};
+
 export const getFarmers = async () => {
   try {
     console.log('Fetching farmers from:', `${API_BASE_URL}/farmers`);
@@ -28,26 +50,23 @@ export const getFarmers = async () => {
   }
 };
 
-// Registering a farmer with a blockchain transaction
 export const registerFarmer = async (accountName, nickname, session) => {
   try {
     console.log('Registering farmer on blockchain:', { accountName, nickname });
 
-    // Prepare the action for the smart contract
     const action = {
-      account: process.env.REACT_APP_CONTRACT_NAME,  // Your contract name
-      name: 'regfarmer',  // Action name on the contract
+      account: process.env.REACT_APP_CONTRACT_NAME,
+      name: 'regfarmer',
       authorization: [{
-        actor: accountName,  // The account performing the transaction
+        actor: accountName,
         permission: 'active',
       }],
       data: {
-        user: accountName,  // The farmer's account name
-        nickname,  // Optional nickname
+        user: accountName,
+        nickname,
       },
     };
 
-    // Execute the transaction using the session
     const result = await session.transact({
       actions: [action],
     }, {
@@ -56,7 +75,7 @@ export const registerFarmer = async (accountName, nickname, session) => {
     });
 
     console.log('Blockchain transaction result:', result);
-    return result;  // Return the result of the transaction
+    return result;
   } catch (error) {
     handleApiError(error, 'registering farmer');
   }
@@ -168,7 +187,10 @@ export const getPlots = async (accountName) => {
   }
 };
 
-export default {
+// Assign object to a variable before exporting to avoid eslint warning
+const api = {
+  getUsername,
+  createUsername,
   getFarmers,
   registerFarmer,
   unregisterFarmer,
@@ -181,3 +203,5 @@ export default {
   getAccountInfo,
   getPlots,
 };
+
+export default api;
