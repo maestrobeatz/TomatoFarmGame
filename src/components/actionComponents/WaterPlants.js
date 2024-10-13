@@ -4,7 +4,8 @@ const WaterPlants = ({ session, plotId, selectedNFTs, setSelectedNFTs, userPlots
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleWaterPlants = async () => {
+  // Memoized function to avoid re-creation
+  const handleWaterPlants = useCallback(async () => {
     if (!session || !session.actor) {
       setStatus('Error: Please login first');
       return;
@@ -13,6 +14,11 @@ const WaterPlants = ({ session, plotId, selectedNFTs, setSelectedNFTs, userPlots
       setStatus('No plot selected or available.');
       return;
     }
+    if (!selectedNFTs.wateringCan) {
+      setStatus('Error: No watering can selected.');
+      return;
+    }
+
     try {
       setIsLoading(true);
       const actionData = {
@@ -22,7 +28,7 @@ const WaterPlants = ({ session, plotId, selectedNFTs, setSelectedNFTs, userPlots
         data: {
           user: session.actor.toString(),
           plot_id: plotId,
-          watering_can_nft_id: selectedNFTs.wateringCan
+          watering_can_nft_id: selectedNFTs.wateringCan,
         }
       };
       await session.transact({ actions: [actionData] });
@@ -32,7 +38,18 @@ const WaterPlants = ({ session, plotId, selectedNFTs, setSelectedNFTs, userPlots
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session, plotId, selectedNFTs]);
+
+  // Check the plot and watering can availability on load or change
+  useEffect(() => {
+    if (!plotId) {
+      setStatus('No plot selected or available.');
+    } else if (!selectedNFTs.wateringCan) {
+      setStatus('Please select a watering can to water the plants.');
+    } else {
+      setStatus('Ready to water plants.');
+    }
+  }, [plotId, selectedNFTs]);
 
   return (
     <div>

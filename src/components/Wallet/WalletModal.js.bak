@@ -1,0 +1,149 @@
+import React, { useState } from 'react';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import { PrivateKey } from 'eosjs-ecc';
+import api from '../api'; // Make sure this path is correct
+import './WalletModal.css';
+
+const WalletModal = ({ show, handleClose }) => {
+  const [importedPrivateKey, setImportedPrivateKey] = useState('');
+  const [publicKey, setPublicKey] = useState('');
+  const [blockchainAccountName, setBlockchainAccountName] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [result, setResult] = useState('');
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleImportedPrivateKeyChange = (e) => setImportedPrivateKey(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
+  const handleConfirmPasswordChange = (e) => setConfirmPassword(e.target.value);
+
+  const derivePublicKey = async () => {
+    setIsLoading(true);
+    try {
+      setResult('Deriving public key...');
+      const privateKey = PrivateKey.fromString(importedPrivateKey);
+      const derivedPublicKey = privateKey.toPublic().toString();
+      setPublicKey(derivedPublicKey);
+      setResult(`Public key derived successfully: ${derivedPublicKey}`);
+
+      try {
+        setResult('Fetching account information...');
+        const accountInfo = await api.getAccountInfo(derivedPublicKey);
+        console.log('Account info response:', accountInfo); // For debugging
+
+        if (accountInfo && accountInfo.accountNames && accountInfo.accountNames.length > 0) {
+          setBlockchainAccountName(accountInfo.accountNames[0]);
+          setResult(`Account found: ${accountInfo.accountNames[0]}`);
+        } else {
+          setBlockchainAccountName('');
+          setResult(`No accounts found for this public key. Full response: ${JSON.stringify(accountInfo)}`);
+        }
+      } catch (accountError) {
+        console.error('Error fetching account info:', accountError);
+        setBlockchainAccountName('');
+        setResult(`Error fetching account information: ${accountError.message}`);
+      }
+    } catch (error) {
+      console.error('Error deriving public key:', error);
+      setPublicKey('');
+      setBlockchainAccountName('');
+      setResult(`Invalid private key: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createMaestroWallet = async () => {
+    if (!blockchainAccountName) {
+      setResult('Please verify your account first.');
+      return;
+    }
+
+    if (!password || password !== confirmPassword) {
+      setResult('Passwords do not match or are invalid.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await api.createMaestroWallet(blockchainAccountName, publicKey, password);
+      setResult(`Success: ${result.message}`);
+    } catch (error) {
+      console.error('Error creating Maestro Wallet:', error);
+      setResult(`Error: ${error.message || 'Failed to create Maestro Wallet. Please try again.'}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Modal show={show} onHide={handleClose} backdrop="static" centered>
+      <div className="wallet-modal-container">
+        <Modal.Header>
+          <Modal.Title>Maestro Wallet</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="wallet-modal-section">
+            <h3>Import Private Key</h3>
+            <input
+              type="text"
+              placeholder="Enter existing private key"
+              value={importedPrivateKey}
+              onChange={handleImportedPrivateKeyChange}
+              disabled={isLoading}
+            />
+            <Button onClick={derivePublicKey} className="derive-public-key-button" disabled={isLoading}>
+              {isLoading ? 'Processing...' : 'Derive Public Key'}
+            </Button>
+
+            {publicKey && (
+              <>
+                <p>Derived Public Key: {publicKey}</p>
+                <p>Blockchain Account: {blockchainAccountName || 'No account found'}</p>
+              </>
+            )}
+
+            {blockchainAccountName && !showPasswordFields && (
+              <Button onClick={() => setShowPasswordFields(true)} className="create-account-button" disabled={isLoading}>
+                Create Maestro Wallet
+              </Button>
+            )}
+
+            {showPasswordFields && (
+              <div className="wallet-modal-section">
+                <input
+                  type="password"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  disabled={isLoading}
+                />
+                <input
+                  type="password"
+                  placeholder="Confirm password"
+                  value={confirmPassword}
+                  onChange={handleConfirmPasswordChange}
+                  disabled={isLoading}
+                />
+                <Button onClick={createMaestroWallet} className="create-account-button" disabled={isLoading}>
+                  {isLoading ? 'Creating...' : 'Create Maestro Wallet'}
+                </Button>
+              </div>
+            )}
+
+            {result && <p className="result-message">{result}</p>}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose} disabled={isLoading}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </div>
+    </Modal>
+  );
+};
+
+export default WalletModal;

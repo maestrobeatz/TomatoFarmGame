@@ -4,7 +4,8 @@ const SellCrops = ({ session, plotId, userPlots }) => {
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSellCrops = async () => {
+  // Memoized handleSellCrops function
+  const handleSellCrops = useCallback(async () => {
     if (!session || !session.actor) {
       setStatus('Error: Please login first');
       return;
@@ -13,6 +14,7 @@ const SellCrops = ({ session, plotId, userPlots }) => {
       setStatus('No plot selected or available.');
       return;
     }
+
     try {
       setIsLoading(true);
       const actionData = {
@@ -31,7 +33,16 @@ const SellCrops = ({ session, plotId, userPlots }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session, plotId]);
+
+  // useEffect to check plot availability
+  useEffect(() => {
+    if (!plotId) {
+      setStatus('No plot selected or available.');
+    } else {
+      setStatus('Ready to sell crops.');
+    }
+  }, [plotId]);
 
   return (
     <div>

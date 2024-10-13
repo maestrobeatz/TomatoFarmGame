@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './NFTList.css';
+import '../styles/NFTList.css'; // Adjust the path
 import NFTModal from './NFTModal';
 
 const NFTList = ({ actor }) => {

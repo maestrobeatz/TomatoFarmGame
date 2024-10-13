@@ -1,0 +1,384 @@
+import React, { useState, useEffect } from 'react';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import PrivateKeyImport from './PrivateKeyImport';
+import AccountCreation from './AccountCreation';
+import MaestroWalletLogin from './MaestroWalletLogin';
+import api from '../api';
+import './WalletModal.css';
+
+const WalletModal = ({ show, handleClose, handleLogout, transactionToSign, onTransactionSigned }) => {
+  const [publicKey, setPublicKey] = useState('');
+  const [privateKey, setPrivateKey] = useState('');
+  const [blockchainAccountName, setBlockchainAccountName] = useState('');
+  const [result, setResult] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [view, setView] = useState('login');
+  const [accountInfo, setAccountInfo] = useState(null);
+  const [walletSession, setWalletSession] = useState(null);
+  const [keyDerived, setKeyDerived] = useState(false); // To track key derivation status
+
+  const [recipientAccount, setRecipientAccount] = useState('');
+  const [transferAmount, setTransferAmount] = useState('');
+  const [transferMemo, setTransferMemo] = useState('');
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Load stored wallet session on first render
+  useEffect(() => {
+    const storedWalletSession = sessionStorage.getItem('walletSession');
+    if (storedWalletSession) {
+      setWalletSession(JSON.parse(storedWalletSession));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (walletSession) {
+      sessionStorage.setItem('walletSession', JSON.stringify(walletSession));
+    }
+  }, [walletSession]);
+
+  useEffect(() => {
+    if (walletSession && walletSession.accountName) {
+      fetchAccountInfo(walletSession.accountName);
+    } else {
+      setView('login');
+      setAccountInfo(null);
+    }
+  }, [walletSession]);
+
+  const fetchAccountInfo = async (accountName) => {
+    setIsLoading(true);
+    try {
+      const accountData = await api.getAccountInfo(accountName);
+      const mappedAccountInfo = {
+        account_name: accountData.accountName,
+        core_liquid_balance: accountData.balance || '0.0000 WAX',
+        cpu_limit: {
+          used: accountData.cpu_stake || 0,
+          max: accountData.cpu_stake || 0,
+        },
+        net_limit: {
+          used: accountData.net_stake || 0,
+          max: accountData.net_stake || 0,
+        },
+        ram_usage: accountData.ram_usage || 0,
+        ram_quota: accountData.ram_quota || 0,
+      };
+      setAccountInfo(mappedAccountInfo);
+      setResult('');
+    } catch (error) {
+      setResult(`Error fetching account info: ${error.message}`);
+      setAccountInfo(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogin = async (accountName, password) => {
+    if (!accountName || !password) {
+      setResult('Please provide both the account name and password.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const loginResult = await api.loginMaestroWallet(accountName, password);
+      setResult(`Login successful: ${loginResult.message}`);
+      setBlockchainAccountName(accountName);
+      setWalletSession({ accountName });
+      await fetchAccountInfo(accountName);
+    } catch (error) {
+      setResult(`Error during login: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (newPassword !== confirmPassword) {
+      setResult("Passwords don't match.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await api.resetPassword(blockchainAccountName, publicKey, newPassword);
+      setResult(`Password reset successful: ${result.message}`);
+    } catch (error) {
+      setResult(`Error resetting password: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleWalletLogout = () => {
+    setWalletSession(null);
+    sessionStorage.removeItem('walletSession');
+    setView('login');
+    setAccountInfo(null);
+    handleLogout();
+  };
+
+  const handleSignTransaction = async () => {
+    if (!walletSession || !walletSession.accountName || !transactionToSign) {
+      setResult('Unable to sign transaction. Please ensure you are logged in.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const signedTransaction = await api.signTransaction(walletSession.accountName, transactionToSign);
+      setResult('Transaction signed successfully');
+      onTransactionSigned(signedTransaction);
+    } catch (error) {
+      setResult(`Error signing transaction: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTransferTokens = async () => {
+    if (!walletSession || !walletSession.accountName || !recipientAccount || !transferAmount) {
+      setResult('Please log in and provide recipient account and transfer amount.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const transferResult = await api.transferTokens(walletSession.accountName, recipientAccount, transferAmount, transferMemo);
+      setResult(`Token transfer successful: ${JSON.stringify(transferResult)}`);
+      await fetchAccountInfo(walletSession.accountName);
+    } catch (error) {
+      setResult(`Error transferring tokens: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Modal show={show} onHide={handleClose} backdrop="static" centered>
+      <div className="wallet-modal-container">
+        <Modal.Header>
+          <Modal.Title>Maestro Wallet</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="wallet-modal-options">
+            {!walletSession ? (
+              <>
+                <button className="wallet-option-button" onClick={() => setView('login')}>
+                  Login
+                </button>
+                <button className="wallet-option-button" onClick={() => setView('create')}>
+                  Create Account
+                </button>
+                <button className="wallet-option-button" onClick={() => setView('reset-password')}>
+                  Reset Password
+                </button>
+              </>
+            ) : (
+              <>
+                <p>Logged in as: {walletSession.accountName}</p>
+                <button className="wallet-option-button" onClick={handleWalletLogout}>
+                  Logout
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Login view */}
+          {!walletSession && view === 'login' && (
+            <div>
+              <input
+                type="text"
+                placeholder="Enter Account Name"
+                value={blockchainAccountName}
+                onChange={(e) => setBlockchainAccountName(e.target.value)}
+                disabled={isLoading}
+              />
+              <input
+                type="password"
+                placeholder="Enter Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={isLoading}
+              />
+              <Button onClick={() => handleLogin(blockchainAccountName, newPassword)}>
+                {isLoading ? 'Logging in...' : 'Login'}
+              </Button>
+            </div>
+          )}
+
+          {/* Create Account view */}
+          {!walletSession && view === 'create' && (
+            <div>
+              <button className="wallet-option-button" onClick={() => setView('import-key')}>
+                Import Key
+              </button>
+              <button className="wallet-option-button" onClick={() => setView('create-blockchain')}>
+                Create Blockchain Account
+              </button>
+              {keyDerived && (
+                <div>
+                  <button className="wallet-option-button" onClick={() => setView('create-new')}>
+                    Create Maestro Wallet
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Import key view */}
+          {!walletSession && view === 'import-key' && (
+            <PrivateKeyImport
+              setPublicKey={setPublicKey}
+              setPrivateKey={setPrivateKey}
+              setBlockchainAccountName={setBlockchainAccountName}
+              handleNextStep={() => {
+                setKeyDerived(true); // Keys derived successfully
+                setView('create'); // Return to account creation view with new button enabled
+              }}
+            />
+          )}
+
+          {/* Create Maestro Wallet */}
+          {!walletSession && view === 'create-new' && (
+            <AccountCreation
+              blockchainAccountName={blockchainAccountName}
+              publicKey={publicKey}
+              privateKey={privateKey}
+              setPublicKey={setPublicKey}
+              setBlockchainAccountName={setBlockchainAccountName}
+              setResult={setResult}
+              isLoading={isLoading}
+            />
+          )}
+
+          {/* Create Blockchain Account */}
+          {!walletSession && view === 'create-blockchain' && (
+            <div>
+              <h3>Create Blockchain Account</h3>
+              <input
+                type="text"
+                placeholder="Enter Account Name"
+                value={blockchainAccountName}
+                onChange={(e) => setBlockchainAccountName(e.target.value)}
+                disabled={isLoading}
+              />
+              <Button
+                onClick={() => {
+                  setIsLoading(true);
+                  api.createWaxAccount(blockchainAccountName, publicKey, newPassword)
+                    .then(response => setResult(`Blockchain Account created: ${response.accountName}`))
+                    .catch(error => setResult(`Error: ${error.message}`))
+                    .finally(() => setIsLoading(false));
+                }}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Creating...' : 'Create Blockchain Account'}
+              </Button>
+            </div>
+          )}
+
+          {!walletSession && view === 'reset-password' && (
+            <div>
+              <h3>Reset Password</h3>
+              <input
+                type="password"
+                placeholder="New password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={isLoading}
+              />
+              <input
+                type="password"
+                placeholder="Confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={isLoading}
+              />
+              <Button
+                onClick={handlePasswordReset}
+                className="reset-password-button"
+                disabled={isLoading || !newPassword || !confirmPassword}
+              >
+                {isLoading ? 'Resetting...' : 'Reset Password'}
+              </Button>
+            </div>
+          )}
+
+          {walletSession && accountInfo && (
+            <div className="wallet-account-info">
+              <h3>Blockchain Account Info</h3>
+              <p>Account Name: {accountInfo.account_name || 'N/A'}</p>
+              <p>Balance: {accountInfo.core_liquid_balance || 'N/A'}</p>
+              <p>CPU Usage: {accountInfo.cpu_limit?.used || 'N/A'}/{accountInfo.cpu_limit?.max || 'N/A'}</p>
+              <p>NET Usage: {accountInfo.net_limit?.used || 'N/A'}/{accountInfo.net_limit?.max || 'N/A'}</p>
+              <p>RAM: {accountInfo.ram_usage || 'N/A'}/{accountInfo.ram_quota || 'N/A'}</p>
+            </div>
+          )}
+
+          {walletSession && transactionToSign && (
+            <div className="wallet-transaction-signing">
+              <h3>Sign Transaction</h3>
+              <p>The game is requesting to perform the following action:</p>
+              <p>{transactionToSign.actions[0].name} on {transactionToSign.actions[0].account}</p>
+              <Button
+                onClick={handleSignTransaction}
+                className="sign-transaction-button"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Signing...' : 'Sign Transaction'}
+              </Button>
+            </div>
+          )}
+
+          {walletSession && (
+            <div className="wallet-token-transfer">
+              <h3>Transfer Tokens</h3>
+              <input
+                type="text"
+                placeholder="Recipient Account"
+                value={recipientAccount}
+                onChange={(e) => setRecipientAccount(e.target.value)}
+                disabled={isLoading}
+              />
+              <input
+                type="text"
+                placeholder="Amount (e.g., 1.0000 WAX)"
+                value={transferAmount}
+                onChange={(e) => setTransferAmount(e.target.value)}
+                disabled={isLoading}
+              />
+              <input
+                type="text"
+                placeholder="Memo (optional)"
+                value={transferMemo}
+                onChange={(e) => setTransferMemo(e.target.value)}
+                disabled={isLoading}
+              />
+              <Button
+                onClick={handleTransferTokens}
+                className="transfer-tokens-button"
+                disabled={isLoading || !recipientAccount || !transferAmount}
+              >
+                {isLoading ? 'Transferring...' : 'Transfer Tokens'}
+              </Button>
+            </div>
+          )}
+
+          {isLoading && <p>Loading...</p>}
+          {result && <p className="result-message">{result}</p>}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose} disabled={isLoading}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </div>
+    </Modal>
+  );
+};
+
+export default WalletModal;

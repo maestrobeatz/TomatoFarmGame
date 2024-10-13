@@ -1,0 +1,112 @@
+/* Login.css */
+
+/* General container setup - making it modal-like */
+.login-container {
+    background-color: white; /* Modal-like white background */
+    padding: 30px; /* Increased padding for a modal effect */
+    border-radius: 10px; /* Rounded corners */
+    width: 400px; /* Modal width */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Modal shadow for depth */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 50px auto; /* Center the modal on the page */
+    text-align: center;
+    overflow-x: hidden;
+}
+
+/* Logo styling */
+.logo-container {
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+/* Buttons styling */
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.button {
+    width: 250px; /* Modal-like width for buttons */
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 10px 0; /* Space between buttons */
+}
+
+.yellow-button {
+    background-color: #ffd700;
+    color: #000;
+}
+
+.green-button {
+    background-color: #32cd32;
+    color: #fff;
+}
+
+.blue-button {
+    background-color: #1e90ff;
+    color: #fff;
+}
+
+.button:hover {
+    opacity: 0.9; /* Slightly darken on hover */
+}
+
+/* Error message styling */
+.error-message {
+    color: red;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #ffe6e6;
+    border: 1px solid red;
+    border-radius: 5px;
+}
+
+/* Close button styling */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: red;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .login-container {
+        width: 100%; /* Full width for mobile */
+        padding: 20px;
+    }
+
+    .button {
+        width: 100%; /* Full-width buttons on mobile */
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}

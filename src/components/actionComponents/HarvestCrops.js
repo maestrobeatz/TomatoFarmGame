@@ -4,7 +4,8 @@ const HarvestCrops = ({ session, plotId, userPlots }) => {
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleHarvest = async () => {
+  // Memoize the handleHarvest function so it doesn't change unnecessarily
+  const handleHarvest = useCallback(async () => {
     if (!session || !session.actor) {
       setStatus('Error: Please login first');
       return;
@@ -31,7 +32,16 @@ const HarvestCrops = ({ session, plotId, userPlots }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session, plotId]);
+
+  // Fetch any necessary data when the component mounts, such as plot data
+  useEffect(() => {
+    if (!plotId || !userPlots || userPlots.length === 0) {
+      setStatus('No available plot to harvest.');
+    } else {
+      setStatus('Ready to harvest crops.');
+    }
+  }, [plotId, userPlots]);
 
   return (
     <div>

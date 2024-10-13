@@ -1,0 +1,203 @@
+/* Wallet Modal Container */
+.wallet-modal-container {
+    background-color: #1e1e1e;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    max-width: 600px; /* Set a max-width for better control */
+    margin: auto; /* Center the modal */
+    max-height: 80vh; /* Limit modal height to 80% of the viewport */
+    overflow-y: auto; /* Enable scrolling if content exceeds the modal's height */
+    z-index: 1060; /* Ensure the modal appears above Wharfkit modal */
+    position: relative; /* Make sure z-index works */
+}
+
+/* Modal Header */
+.wallet-modal-container .modal-header {
+    border-bottom: 1px solid #333;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.wallet-modal-container .modal-title {
+    color: #4CAF50;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Input Fields */
+.wallet-modal-container input[type="text"],
+.wallet-modal-container input[type="password"] {
+    font-size: 1.2rem;
+    padding: 10px;
+    width: 100%;
+    margin: 10px 0;
+    border: 2px solid #444;
+    border-radius: 8px;
+    background-color: #333;
+    color: white;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.wallet-modal-container input[type="text"]:focus,
+.wallet-modal-container input[type="password"]:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+/* Buttons */
+.wallet-modal-container button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    margin: 10px 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.wallet-modal-container button:hover {
+    background-color: #45a049;
+}
+
+.wallet-modal-container button:disabled {
+    background-color: #555;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* Wallet Options */
+.wallet-modal-options {
+    display: flex;
+    flex-wrap: wrap; /* Ensure buttons wrap */
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.wallet-option-button {
+    width: calc(33.333% - 10px); /* Ensure buttons fit in 3 per row */
+    margin: 5px;
+}
+
+/* Close Button */
+.wallet-modal-container .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    color: #4CAF50;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.wallet-modal-container .modal-close:hover {
+    color: #45a049;
+}
+
+/* Account Info Section */
+.wallet-account-info {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    max-height: 60vh; /* Ensure the account info doesn't overflow */
+    overflow-y: auto; /* Enable scrolling for account info */
+}
+
+.wallet-account-info h3 {
+    margin-top: 0;
+    color: #4CAF50;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.wallet-account-info p {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.wallet-account-info strong {
+    color: #4CAF50;
+}
+
+/* Account Info Items */
+.account-info-item {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #4b4b4b;
+    padding-bottom: 1rem;
+}
+
+/* Result Message */
+.result-message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    font-size: 14px;
+    max-height: 150px; /* Limit the height of the result box */
+    overflow-y: auto; /* Add vertical scrollbar if necessary */
+    white-space: pre-wrap; /* Wrap long text to the next line */
+    word-wrap: break-word; /* Break words that are too long */
+}
+
+/* Wallet Modal Sections */
+.wallet-modal-section {
+    margin-top: 20px;
+}
+
+.wallet-modal-section h3 {
+    color: #4CAF50;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+/* Loading Indicator */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-indicator {
+    border: 4px solid #333;
+    border-top: 4px solid #4CAF50;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+/* Footer */
+.wallet-modal-container .modal-footer {
+    border-top: 1px solid #333;
+    padding-top: 15px;
+    margin-top: 20px;
+    text-align: right;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .wallet-modal-options {
+        flex-direction: column;
+    }
+
+    .wallet-option-button {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .wallet-modal-container input[type="text"],
+    .wallet-modal-container input[type="password"] {
+        max-width: 100%;
+    }
+}

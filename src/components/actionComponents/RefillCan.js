@@ -4,9 +4,14 @@ const RefillCan = ({ session, selectedNFTs }) => {
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleRefill = async () => {
+  // Memoized handleRefill function to avoid re-creation on every render
+  const handleRefill = useCallback(async () => {
     if (!session || !session.actor) {
       setStatus('Error: Please login first');
+      return;
+    }
+    if (!selectedNFTs.wateringCan) {
+      setStatus('Error: No watering can selected.');
       return;
     }
     try {
@@ -27,7 +32,16 @@ const RefillCan = ({ session, selectedNFTs }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session, selectedNFTs]);
+
+  // UseEffect to set initial status or check if the necessary data is available
+  useEffect(() => {
+    if (!selectedNFTs.wateringCan) {
+      setStatus('Please select a watering can to refill.');
+    } else {
+      setStatus('Ready to refill the watering can.');
+    }
+  }, [selectedNFTs.wateringCan]);
 
   return (
     <div>

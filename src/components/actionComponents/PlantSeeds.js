@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const PlantSeeds = ({ session, plotId, selectedNFTs }) => {
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handlePlantSeeds = async () => {
+  // Memoized handlePlantSeeds function to avoid re-creation on every render
+  const handlePlantSeeds = useCallback(async () => {
     if (!session || !session.actor) {
       setStatus('Error: Please login first');
       return;
@@ -13,6 +14,11 @@ const PlantSeeds = ({ session, plotId, selectedNFTs }) => {
       setStatus('No plot selected or available.');
       return;
     }
+    if (!selectedNFTs.seed || !selectedNFTs.compost) {
+      setStatus('Error: Seed or compost not selected.');
+      return;
+    }
+
     try {
       setIsLoading(true);
       const actionData = {
@@ -33,7 +39,18 @@ const PlantSeeds = ({ session, plotId, selectedNFTs }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session, plotId, selectedNFTs]);
+
+  // UseEffect to set initial status or check if the necessary data is available
+  useEffect(() => {
+    if (!plotId) {
+      setStatus('No plot selected or available.');
+    } else if (!selectedNFTs.seed || !selectedNFTs.compost) {
+      setStatus('Please select both seed and compost to plant.');
+    } else {
+      setStatus('Ready to plant seeds.');
+    }
+  }, [plotId, selectedNFTs]);
 
   return (
     <div>

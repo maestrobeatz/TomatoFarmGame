@@ -1,6 +1,6 @@
 // NFTModal.js
 import React from 'react';
-import './NFTModal.css';
+import '../styles/NFTModal.css'; // Correct the path
 
 const NFTModal = ({ nft, onClose }) => {
   if (!nft || !nft.metadata || !nft.metadata.deserialized) return null;

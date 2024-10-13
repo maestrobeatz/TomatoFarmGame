@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Onboarding.css';
+import '../styles/Onboarding.css';
 
 const Onboarding = ({ onComplete }) => {
   const [step, setStep] = useState(1);

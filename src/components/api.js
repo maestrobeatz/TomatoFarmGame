@@ -1,207 +1,265 @@
 import axios from 'axios';
+import { handleApiError } from './utils';  // Assuming utils.js contains error handling
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://maestrobeatz.servegame.com:3003';
 
-// Helper function to handle API errors
-const handleApiError = (error, context) => {
-  console.error(`Error ${context}:`, error);
-  if (error.response) {
-    console.error('Response data:', error.response.data);
-    console.error('Response status:', error.response.status);
-    console.error('Response headers:', error.response.headers);
-  } else if (error.request) {
-    console.error('No response received:', error.request);
-  } else {
-    console.error('Error message:', error.message);
-  }
-  throw error;
-};
-
-export const getUsername = async (accountName) => {
-  try {
-    console.log(`Fetching username for account: ${accountName}`);
-    const response = await axios.get(`${API_BASE_URL}/usernames/${accountName}`);
-    console.log('Username received:', response.data);
-    return response.data;
-  } catch (error) {
-    handleApiError(error, 'fetching username');
-  }
-};
-
-export const createUsername = async (accountName, username) => {
-  try {
-    console.log('Creating username:', { accountName, username });
-    const response = await axios.post(`${API_BASE_URL}/usernames`, { accountName, username });
-    console.log('Username created:', response.data);
-    return response.data;
-  } catch (error) {
-    handleApiError(error, 'creating username');
-  }
-};
-
+// Get list of farmers
 export const getFarmers = async () => {
   try {
-    console.log('Fetching farmers from:', `${API_BASE_URL}/farmers`);
     const response = await axios.get(`${API_BASE_URL}/farmers`);
-    console.log('Farmers data received:', response.data);
-    return response.data;
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from getFarmers response');
+    }
   } catch (error) {
     handleApiError(error, 'fetching farmers');
   }
 };
 
+// Register a farmer
 export const registerFarmer = async (accountName, nickname, session) => {
   try {
-    console.log('Registering farmer on blockchain:', { accountName, nickname });
-
-    const action = {
-      account: process.env.REACT_APP_CONTRACT_NAME,
-      name: 'regfarmer',
-      authorization: [{
-        actor: accountName,
-        permission: 'active',
-      }],
-      data: {
-        user: accountName,
-        nickname,
-      },
-    };
-
-    const result = await session.transact({
-      actions: [action],
-    }, {
-      blocksBehind: 3,
-      expireSeconds: 30,
-    });
-
-    console.log('Blockchain transaction result:', result);
-    return result;
+    const response = await axios.post(`${API_BASE_URL}/farmers/register`, { accountName, nickname, session });
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from registerFarmer response');
+    }
   } catch (error) {
     handleApiError(error, 'registering farmer');
   }
 };
 
+// Unregister a farmer
 export const unregisterFarmer = async (user) => {
   try {
-    console.log('Unregistering farmer:', user);
-    const response = await axios.post(`${API_BASE_URL}/farmers/unregFarmer`, { user });
-    console.log('Unregister farmer response:', response.data);
-    return response.data.action;
+    const response = await axios.post(`${API_BASE_URL}/farmers/unregister`, { user });
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from unregisterFarmer response');
+    }
   } catch (error) {
-    handleApiError(error, 'preparing unregister farmer action');
+    handleApiError(error, 'unregistering farmer');
   }
 };
 
+// Confirm farmer unregistration
 export const confirmUnregisterFarmer = async (user, transactionId) => {
   try {
-    console.log('Confirming unregister farmer:', { user, transactionId });
-    const response = await axios.post(`${API_BASE_URL}/farmers/confirmUnregisterFarmer`, { 
-      user, 
-      transactionId 
-    });
-    console.log('Confirm unregister farmer response:', response.data);
-    return response.data;
+    const response = await axios.post(`${API_BASE_URL}/farmers/confirm-unregister`, { user, transactionId });
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from confirmUnregisterFarmer response');
+    }
   } catch (error) {
-    handleApiError(error, 'confirming unregister farmer transaction');
+    handleApiError(error, 'confirming farmer unregistration');
   }
 };
 
+// Get user NFTs
+export const getUserNFTs = async (accountName) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/nfts/${accountName}`);
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from getUserNFTs response');
+    }
+  } catch (error) {
+    handleApiError(error, 'fetching user NFTs');
+  }
+};
+
+// Mint an asset
+export const mintAsset = async (accountName, templateId) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/nfts/mint`, { accountName, templateId });
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from mintAsset response');
+    }
+  } catch (error) {
+    handleApiError(error, 'minting asset');
+  }
+};
+
+// Get inventory by actor
 export const getInventory = async (actor) => {
   try {
-    console.log('Fetching inventory for actor:', actor);
-    const response = await axios.get(`${API_BASE_URL}/nfts/${actor}`);
-    console.log('Inventory data received:', response.data);
-    return response.data;
+    const response = await axios.get(`${API_BASE_URL}/inventory/${actor}`);
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from getInventory response');
+    }
   } catch (error) {
     handleApiError(error, 'fetching inventory');
   }
 };
 
+// Get farms with plots for a specific user
 export const getFarmsWithPlots = async (accountName) => {
   try {
-    console.log('Fetching farms with plots for:', accountName);
     const response = await axios.get(`${API_BASE_URL}/farms/farms-with-plots/${accountName}`);
-    console.log('Farms with plots data received:', response.data);
-    return response.data;
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from getFarmsWithPlots response');
+    }
   } catch (error) {
     handleApiError(error, 'fetching farms with plots');
   }
 };
 
-export const verifyLogin = async (actor, permission, signature) => {
+// Get all farms in the game
+export const getAllFarms = async () => {
   try {
-    console.log('Verifying login for actor:', actor);
-    const response = await axios.post(`${API_BASE_URL}/verifyLogin`, {
-      actor,
-      permission,
-      signature,
-    });
-    console.log('Verify login response:', response.data);
-    return response.data;
+    const response = await axios.get(`${API_BASE_URL}/farms/all-farms`);
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from getAllFarms response');
+    }
   } catch (error) {
-    handleApiError(error, 'verifying login');
+    handleApiError(error, 'fetching all farms');
   }
 };
 
+// Get plot status
 export const getPlotStatus = async (plotId) => {
   try {
-    console.log('Fetching plot status for plotId:', plotId);
-    const response = await axios.get(`${API_BASE_URL}/plotStatus/${plotId}`);
-    console.log('Plot status received:', response.data);
-    return response.data;
+    const response = await axios.get(`${API_BASE_URL}/plots/status/${plotId}`);
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from getPlotStatus response');
+    }
   } catch (error) {
     handleApiError(error, 'fetching plot status');
   }
 };
 
+// Get NFT status
 export const getNFTStatus = async (nftId) => {
   try {
-    console.log('Fetching NFT status for nftId:', nftId);
-    const response = await axios.get(`${API_BASE_URL}/nftStatus/${nftId}`);
-    console.log('NFT status received:', response.data);
-    return response.data;
+    const response = await axios.get(`${API_BASE_URL}/nfts/status/${nftId}`);
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from getNFTStatus response');
+    }
   } catch (error) {
     handleApiError(error, 'fetching NFT status');
   }
 };
 
-export const getAccountInfo = async (accountName) => {
-  try {
-    console.log('Fetching account info for:', accountName);
-    const response = await axios.get(`${API_BASE_URL}/account/${accountName}`);
-    console.log('Account info received:', response.data);
-    return response.data;
-  } catch (error) {
-    handleApiError(error, 'fetching account info');
-  }
-};
-
+// Get plots for an account
 export const getPlots = async (accountName) => {
   try {
-    console.log('Fetching plots for:', accountName);
     const response = await axios.get(`${API_BASE_URL}/plots/${accountName}`);
-    console.log('Plots data received:', response.data);
-    return response.data;
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from getPlots response');
+    }
   } catch (error) {
     handleApiError(error, 'fetching plots');
   }
 };
 
-// Assign object to a variable before exporting to avoid eslint warning
+// Get account information and balance
+export const getAccountInfo = async (accountName) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/account-name/${accountName}`);
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from getAccountInfo response');
+    }
+  } catch (error) {
+    handleApiError(error, 'fetching account information');
+  }
+};
+
+// Get username for an account
+export const getUsername = async (accountName) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/usernames/${accountName}`);
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from getUsername response');
+    }
+  } catch (error) {
+    handleApiError(error, 'getting username');
+  }
+};
+
+// Create a username for an account
+export const createUsername = async (accountName, username) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/usernames/create`, {
+      accountName,
+      username,
+    });
+
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error('No data received from createUsername response');
+    }
+  } catch (error) {
+    handleApiError(error, 'creating username');
+  }
+};
+
+// Create a new farm
+export const createFarm = async (transactionData) => {
+  try {
+    console.log('Sending transaction data to backend:', JSON.stringify(transactionData, null, 2));
+    if (!transactionData.signatures || !transactionData.packed_trx) {
+      throw new Error('Invalid transaction data: Missing signatures or packed_trx');
+    }
+    const response = await axios.post(`${API_BASE_URL}/farms/create-farm`, transactionData);
+    console.log('createFarm response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error in createFarm:', error);
+    if (error.response) {
+      console.error('Error response:', error.response.data);
+      console.error('Error status:', error.response.status);
+      console.error('Error headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('Error request:', error.request);
+    } else {
+      console.error('Error message:', error.message);
+    }
+    handleApiError(error, 'creating farm');
+  }
+};
+
+// Exporting all the API functions
 const api = {
-  getUsername,
-  createUsername,
   getFarmers,
   registerFarmer,
   unregisterFarmer,
   confirmUnregisterFarmer,
+  getUserNFTs,
+  mintAsset,
   getInventory,
   getFarmsWithPlots,
-  verifyLogin,
+  getAllFarms, // Fetch all farms in the game
   getPlotStatus,
   getNFTStatus,
-  getAccountInfo,
   getPlots,
+  getAccountInfo,
+  getUsername,
+  createUsername,
+  createFarm, // Add the createFarm function here
 };
 
 export default api;
