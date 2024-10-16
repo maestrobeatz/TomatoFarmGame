@@ -4,14 +4,13 @@ const PlantSeeds = ({ session, plotId, selectedNFTs }) => {
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Memoized handlePlantSeeds function to avoid re-creation on every render
   const handlePlantSeeds = useCallback(async () => {
     if (!session || !session.actor) {
       setStatus('Error: Please login first');
       return;
     }
     if (!plotId) {
-      setStatus('No plot selected or available.');
+      setStatus('Error: No plot selected or available.');
       return;
     }
     if (!selectedNFTs.seed || !selectedNFTs.compost) {
@@ -19,29 +18,35 @@ const PlantSeeds = ({ session, plotId, selectedNFTs }) => {
       return;
     }
 
+    setIsLoading(true);
+    setStatus('Planting seeds, please wait...');
+
     try {
-      setIsLoading(true);
+      // Prepare transaction action data
       const actionData = {
-        account: process.env.REACT_APP_CONTRACT_NAME,
-        name: 'plantseeds',
+        account: process.env.REACT_APP_CONTRACT_NAME,  // Smart contract name
+        name: 'plantseeds',  // The action name on the smart contract
         authorization: [{ actor: session.actor.toString(), permission: 'active' }],
         data: {
-          user: session.actor.toString(),
-          plot_id: plotId,
-          seed_nft_id: selectedNFTs.seed,
-          compost_nft_id: selectedNFTs.compost
+          user: session.actor.toString(),  // The current user performing the transaction
+          plot_id: plotId,  // The selected plot ID where seeds are being planted
+          seed_nft_id: selectedNFTs.seed,  // The NFT ID of the selected seed
+          compost_nft_id: selectedNFTs.compost  // The NFT ID of the selected compost
         }
       };
+
+      // Execute the transaction using the session
       await session.transact({ actions: [actionData] });
-      setStatus('Seeds planted successfully.');
+
+      setStatus('Seeds planted successfully!');
     } catch (error) {
+      console.error('Transaction failed:', error);  // Log the error for debugging
       setStatus(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   }, [session, plotId, selectedNFTs]);
 
-  // UseEffect to set initial status or check if the necessary data is available
   useEffect(() => {
     if (!plotId) {
       setStatus('No plot selected or available.');

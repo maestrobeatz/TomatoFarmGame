@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import useSession from './hooks/useSession';
+import { InitTransaction } from './components/transactionHandler'; // Import transaction handler
 import Login from './components/Login';
 import WalletModal from './components/Wallet/WalletModal';
 import NFTList from './components/NFTList';
@@ -15,13 +16,9 @@ import logo from './MaestroBeatzLogo.png';
 import {
   getFarmers,
   getFarmsWithPlots,
-  getPlots,
-  registerFarmer,
-  getUsername,
-  createUsername,
-  getUserNFTs
+  getPlots
 } from './components/api';
-import { fetchAccountInfoByAccountName } from './components/Wallet/walletApi/accountApi'; 
+import { fetchAccountInfoByAccountName } from './components/Wallet/walletApi/accountApi';
 
 function AppContent() {
   const { session, handleLogin, handleLogout } = useSession();
@@ -29,7 +26,7 @@ function AppContent() {
   const [farmers, setFarmers] = useState([]);
   const [farms, setFarms] = useState([]);
   const [plots, setPlots] = useState([]);
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false); 
   const [selectedAction, setSelectedAction] = useState('plantseeds');
   const [selectedNFTs, setSelectedNFTs] = useState({});
   const [loadingStates, setLoadingStates] = useState({
@@ -38,10 +35,10 @@ function AppContent() {
     farms: false,
     plots: false,
   });
-  const [username, setUsername] = useState(null);
   const [newUsername, setNewUsername] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Fetch the list of farmers
   const fetchFarmersList = useCallback(async () => {
     setLoadingStates((prev) => ({ ...prev, farmers: true }));
     try {
@@ -54,18 +51,18 @@ function AppContent() {
     }
   }, []);
 
-  const fetchUsername = useCallback(async () => {
+  // Check if the current user is a registered farmer
+  const checkFarmerRegistration = useCallback(() => {
     if (session && session.actor) {
-      try {
-        const fetchedUsername = await getUsername(session.actor.toString());
-        setUsername(fetchedUsername?.username || null);
-      } catch (err) {
-        console.error("Error fetching username:", err);
-      }
+      const isUserRegistered = farmers.some(farmer => farmer.account === session.actor.toString());
+      setIsRegistered(isUserRegistered);
     }
-  }, [session]);
+  }, [session, farmers]);
 
-  // Fetch plots only when actions are performed
+  // Find the current user's username in the farmers list
+  const currentUser = session && session.actor ? farmers.find(farmer => farmer.account === session.actor.toString()) : null;
+  const username = currentUser?.username || null;
+
   const fetchPlotsData = useCallback(async () => {
     if (!session || !session.actor) return;
     const accountName = session.actor.toString();
@@ -81,7 +78,6 @@ function AppContent() {
     }
   }, [session]);
 
-  // Fetch general user data (farms, account info)
   const fetchUserData = useCallback(async () => {
     if (!session || !session.actor) return;
     const accountName = session.actor.toString();
@@ -106,19 +102,21 @@ function AppContent() {
       setLoadingStates((prev) => ({ ...prev, farms: false }));
     }
 
-    // Fetch plots only once here (on initial load)
     fetchPlotsData();
   }, [session, fetchPlotsData]);
 
   useEffect(() => {
     if (session && session.actor) {
       fetchUserData();
-      fetchUsername();
     } else {
       console.warn("No valid session, skipping user data fetch.");
     }
     fetchFarmersList();
-  }, [session, fetchUserData, fetchFarmersList, fetchUsername]);
+  }, [session, fetchUserData, fetchFarmersList]);
+
+  useEffect(() => {
+    checkFarmerRegistration();
+  }, [farmers, checkFarmerRegistration]);
 
   const handleRegisterFarmer = async () => {
     if (!session || !session.actor) {
@@ -127,8 +125,23 @@ function AppContent() {
     }
 
     try {
-      const result = await registerFarmer(session.actor.toString(), 'Nickname', session);
-      console.log('Register farmer result:', result);
+      const transactionData = {
+        actions: [{
+          account: process.env.REACT_APP_CONTRACT_NAME, // Use contract name from .env
+          name: "regfarmer",
+          authorization: [{
+            actor: session.actor,
+            permission: "active",
+          }],
+          data: {
+            user: session.actor,
+          }
+        }]
+      };
+
+      const result = await InitTransaction(transactionData);
+      console.log('Farmer registration transaction result:', result);
+
       setIsRegistered(true);
       await fetchFarmersList();
     } catch (err) {
@@ -143,10 +156,28 @@ function AppContent() {
     }
 
     try {
-      await createUsername(session.actor.toString(), newUsername);
-      setUsername(newUsername);
-      setNewUsername('');
+      const transactionData = {
+        actions: [{
+          account: process.env.REACT_APP_CONTRACT_NAME, // Use contract name from .env
+          name: "addusername",
+          authorization: [{
+            actor: session.actor,
+            permission: "active",
+          }],
+          data: {
+            user: session.actor,
+            nickname: newUsername,
+          }
+        }]
+      };
+
+      // Perform the transaction
+      const result = await InitTransaction(transactionData);
+      console.log('Username creation transaction result:', result);
+
+      // After creating the username, refresh the farmers list
       await fetchFarmersList();
+
     } catch (err) {
       console.error("Failed to create username:", err);
     }
@@ -154,9 +185,8 @@ function AppContent() {
 
   const handleActionSelection = async (action) => {
     setSelectedAction(action);
-    // Fetch plots after plot actions (planting, watering, harvesting)
     if (['plantseeds', 'waterplants', 'harvest', 'sellcrops', 'refillcan'].includes(action)) {
-      await fetchPlotsData(); // Refetch plot data after plot-related actions
+      await fetchPlotsData();
     }
   };
 
@@ -183,7 +213,7 @@ function AppContent() {
             Register as Farmer
           </button>
         )}
-        {session && !username && (
+        {session && isRegistered && (username === null || username === 'N/A') && ( // Only render if username is null or 'N/A'
           <div>
             <input
               type="text"

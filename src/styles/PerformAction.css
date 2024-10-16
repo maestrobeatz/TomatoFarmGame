@@ -11,8 +11,10 @@
   gap: 10px;
   margin-bottom: 20px;
   justify-content: center;
+  width: 100%; /* Ensure the container adjusts to the screen size */
 }
 
+/* Updated to ensure that the container doesn't overflow on small screens */
 .nft-display {
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -21,6 +23,8 @@
   max-width: 180px;
   text-align: center;
   flex: 1;
+  min-width: 140px; /* Ensures a minimum width for smaller screens */
+  overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 .nft-display img.nft-image {
@@ -39,6 +43,40 @@
 .nft-display p {
   font-size: 11px;
   margin: 5px 0;
+}
+
+/* Make the select dropdown responsive and prevent overflow */
+.nft-display select {
+  width: 100%; /* Make sure the select dropdown takes the full width of the container */
+  max-width: 200px; /* Set a max width so it doesn’t become too large */
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  font-size: 14px;
+  overflow: hidden; /* Prevent content overflow */
+  text-overflow: ellipsis; /* Add ellipsis for long text */
+  box-sizing: border-box;
+}
+
+/* Adjust for smaller screens */
+@media (max-width: 768px) {
+  .nft-display {
+    max-width: 140px;
+    min-width: 120px; /* Adjust width for mobile screens */
+  }
+
+  .nft-display img.nft-image {
+    max-height: 70px;
+  }
+
+  .perform-action button {
+    width: 80%;
+  }
+
+  .nft-display select {
+    max-width: 100%; /* Allow dropdown to adjust fully to the container */
+  }
 }
 
 .progress-container {
@@ -86,18 +124,4 @@
 
 .perform-action button:hover:not(:disabled) {
   background-color: #45a049;
-}
-
-@media (max-width: 768px) {
-  .nft-display {
-    max-width: 140px;
-  }
-
-  .nft-display img.nft-image {
-    max-height: 70px;
-  }
-
-  .perform-action button {
-    width: 80%;
-  }
 }
