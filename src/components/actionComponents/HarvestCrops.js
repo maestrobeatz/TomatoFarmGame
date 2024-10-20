@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-const HarvestCrops = ({ session, plotId, userPlots }) => {
+const HarvestCrops = ({ session, plotId }) => {
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Memoize the handleHarvest function so it doesn't change unnecessarily
+  // Function to handle the harvest action
   const handleHarvest = useCallback(async () => {
     if (!session || !session.actor) {
       setStatus('Error: Please login first');
@@ -14,8 +14,11 @@ const HarvestCrops = ({ session, plotId, userPlots }) => {
       setStatus('No plot selected or available.');
       return;
     }
+
+    setIsLoading(true);
+    setStatus('Harvesting crops, please wait...');
+
     try {
-      setIsLoading(true);
       const actionData = {
         account: process.env.REACT_APP_CONTRACT_NAME,
         name: 'harvest',
@@ -26,22 +29,23 @@ const HarvestCrops = ({ session, plotId, userPlots }) => {
         }
       };
       await session.transact({ actions: [actionData] });
-      setStatus('Crops harvested successfully.');
+      setStatus('Crops harvested successfully!');
     } catch (error) {
+      console.error('Transaction failed:', error); // Log the error for debugging
       setStatus(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   }, [session, plotId]);
 
-  // Fetch any necessary data when the component mounts, such as plot data
+  // Check plot status on component mount
   useEffect(() => {
-    if (!plotId || !userPlots || userPlots.length === 0) {
-      setStatus('No available plot to harvest.');
+    if (!plotId) {
+      setStatus('No plot selected or available.');
     } else {
       setStatus('Ready to harvest crops.');
     }
-  }, [plotId, userPlots]);
+  }, [plotId]);
 
   return (
     <div>

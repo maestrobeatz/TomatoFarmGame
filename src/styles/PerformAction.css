@@ -8,8 +8,8 @@
 .nft-display-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 15px; /* Increased gap for better spacing */
+  margin-bottom: 30px; /* Extra margin to separate content */
   justify-content: center;
   width: 100%; /* Ensure the container adjusts to the screen size */
 }
@@ -18,13 +18,19 @@
 .nft-display {
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 10px;
-  background-color: #fff;
+  padding: 15px; /* More padding for a cleaner look */
+  background-color: #f9f9f9; /* Softer background */
   max-width: 180px;
   text-align: center;
   flex: 1;
   min-width: 140px; /* Ensures a minimum width for smaller screens */
   overflow-x: hidden; /* Prevent horizontal overflow */
+  transition: transform 0.3s ease, background-color 0.3s ease; /* Added transition for hover effect */
+}
+
+.nft-display:hover {
+  transform: scale(1.05); /* Slight scaling on hover for interactivity */
+  background-color: #f0f8ff; /* Light blue background on hover */
 }
 
 .nft-display img.nft-image {
@@ -32,50 +38,59 @@
   height: auto;
   border-radius: 8px;
   margin-top: 10px;
-  max-height: 90px;
+  max-height: 100px; /* Slightly increased max height */
 }
 
 .nft-display h3 {
-  font-size: 13px;
+  font-size: 14px; /* Increased font size for better readability */
   margin: 10px 0 5px;
+  font-weight: bold;
+  color: #333; /* Darker color for better contrast */
 }
 
 .nft-display p {
-  font-size: 11px;
+  font-size: 12px; /* Slightly increased font size */
   margin: 5px 0;
+  color: #555; /* Softer gray for descriptive text */
 }
 
-/* Make the select dropdown responsive and prevent overflow */
+/* Improved select dropdown appearance */
 .nft-display select {
-  width: 100%; /* Make sure the select dropdown takes the full width of the container */
-  max-width: 200px; /* Set a max width so it doesn’t become too large */
-  padding: 8px;
+  width: 100%; 
+  max-width: 220px; 
+  padding: 10px; /* Increased padding for easier interaction */
   border-radius: 5px;
   border: 1px solid #ccc;
   background-color: #fff;
   font-size: 14px;
-  overflow: hidden; /* Prevent content overflow */
-  text-overflow: ellipsis; /* Add ellipsis for long text */
+  overflow: hidden; 
+  text-overflow: ellipsis; 
   box-sizing: border-box;
+  transition: border-color 0.3s ease; /* Smooth border transition on focus */
+}
+
+.nft-display select:focus {
+  border-color: #007bff; /* Blue border on focus */
+  outline: none; /* Remove default outline */
 }
 
 /* Adjust for smaller screens */
 @media (max-width: 768px) {
   .nft-display {
     max-width: 140px;
-    min-width: 120px; /* Adjust width for mobile screens */
+    min-width: 120px;
   }
 
   .nft-display img.nft-image {
-    max-height: 70px;
+    max-height: 80px;
   }
 
   .perform-action button {
-    width: 80%;
+    width: 85%;
   }
 
   .nft-display select {
-    max-width: 100%; /* Allow dropdown to adjust fully to the container */
+    max-width: 100%;
   }
 }
 
@@ -88,10 +103,26 @@
   margin-top: 5px;
 }
 
-.refill-button {
+/* Styling for the Refill Button */
+.refill-button-blue {
   margin-top: 10px;
-  font-size: 11px;
-  padding: 5px 10px;
+  font-size: 14px; /* Increased font size for better readability */
+  padding: 8px 16px; /* More padding for a consistent button size */
+  background-color: #007bff; /* Blue background for the refill button */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.refill-button-blue:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.refill-button-blue:disabled {
+  background-color: #6c757d; /* Gray background when disabled */
+  cursor: not-allowed;
 }
 
 .plot-select {
@@ -105,23 +136,32 @@
 .perform-action button {
   width: 50%;
   margin: 10px auto;
-  padding: 10px;
+  padding: 12px; /* Increased padding for a larger click area */
   font-size: 16px;
-  background-color: #4CAF50;
+  background-color: #4CAF50; /* Updated to a brighter green for better visibility */
   color: white !important;
   font-weight: bold !important;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .perform-action button:disabled {
-  background-color: #f44336; /* Updated to match the red styling for disabled buttons */
-  color: white; /* Keep the text color white for better contrast */
+  background-color: #f44336; /* Red background for disabled state */
+  color: white;
   cursor: not-allowed;
 }
 
 .perform-action button:hover:not(:disabled) {
-  background-color: #45a049;
+  background-color: #45a049; /* Slightly darker green on hover */
+}
+
+/* Add button focus style for accessibility */
+.perform-action button:focus {
+  outline: 3px solid #007bff; /* Blue outline for focus */
+}
+
+.perform-action button:focus:not(:disabled) {
+  background-color: #45a049; /* Keep hover effect even when focused */
 }

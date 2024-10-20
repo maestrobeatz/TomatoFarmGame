@@ -11,7 +11,6 @@ import AccountInfo from './components/Game/AccountInfo';
 import FarmersList from './components/Game/FarmersList';
 import PlotStatus from './components/Game/PlotStatus';
 import PerformAction from './components/Game/PerformAction';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from './MaestroBeatzLogo.png';  
 import {
   getFarmers,
@@ -252,7 +251,6 @@ function AppContent() {
                 <button onClick={() => handleActionSelection('waterplants')}>Water Plants</button>
                 <button onClick={() => handleActionSelection('harvest')}>Harvest</button>
                 <button onClick={() => handleActionSelection('sellcrops')}>Sell Crops</button>
-                <button onClick={() => handleActionSelection('refillcan')}>Refill Water</button>
               </div>
               <PerformAction session={session} action={selectedAction} selectedNFTs={selectedNFTs} setSelectedNFTs={setSelectedNFTs} userPlots={plots} />
             </div>

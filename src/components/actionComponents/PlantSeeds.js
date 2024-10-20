@@ -59,7 +59,10 @@ const PlantSeeds = ({ session, plotId, selectedNFTs }) => {
 
   return (
     <div>
-      <button onClick={handlePlantSeeds} disabled={isLoading}>
+      <button 
+        onClick={handlePlantSeeds} 
+        disabled={isLoading || !plotId || !selectedNFTs.seed || !selectedNFTs.compost}
+      >
         {isLoading ? 'Planting...' : 'Plant Seeds'}
       </button>
       {status && <p>{status}</p>}

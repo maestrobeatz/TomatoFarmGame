@@ -172,6 +172,20 @@ export const getUsername = async (accountName) => {
   }
 };
 
+// Fetch watering can data
+export const getWateringCanData = async (nftId) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/watering/wateringcan/${nftId}`);
+    if (response && response.data) {
+      return response.data;  // Return the usesLeft data from backend
+    } else {
+      throw new Error('No data received from getWateringCanData response');
+    }
+  } catch (error) {
+    handleApiError(error, 'fetching watering can data');
+  }
+};
+
 // Exporting all the API functions
 const api = {
   getFarmers,
@@ -186,6 +200,7 @@ const api = {
   getNFTStatus,
   getPlots,
   getAccountInfo,
+  getWateringCanData,  // Newly added for fetching watering can data
 };
 
 export default api;
