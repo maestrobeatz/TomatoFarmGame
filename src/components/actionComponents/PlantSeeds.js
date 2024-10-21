@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { InitTransaction } from '../../hooks/useSession';  // Correct import path
 
 const PlantSeeds = ({ session, plotId, selectedNFTs }) => {
   const [status, setStatus] = useState('');
@@ -22,25 +23,29 @@ const PlantSeeds = ({ session, plotId, selectedNFTs }) => {
     setStatus('Planting seeds, please wait...');
 
     try {
-      // Prepare transaction action data
       const actionData = {
-        account: process.env.REACT_APP_CONTRACT_NAME,  // Smart contract name
-        name: 'plantseeds',  // The action name on the smart contract
-        authorization: [{ actor: session.actor.toString(), permission: 'active' }],
-        data: {
-          user: session.actor.toString(),  // The current user performing the transaction
-          plot_id: plotId,  // The selected plot ID where seeds are being planted
-          seed_nft_id: selectedNFTs.seed,  // The NFT ID of the selected seed
-          compost_nft_id: selectedNFTs.compost  // The NFT ID of the selected compost
-        }
+        actions: [{
+          account: process.env.REACT_APP_CONTRACT_NAME,
+          name: 'plantseeds',
+          authorization: [{ actor: session.actor.toString(), permission: 'active' }],
+          data: {
+            user: session.actor.toString(),
+            plot_id: plotId.toString(),        // Ensure it's a string
+            seed_nft_id: selectedNFTs.seed.toString(),   // Ensure it's a string
+            compost_nft_id: selectedNFTs.compost.toString()  // Ensure it's a string
+          }
+        }]
       };
 
-      // Execute the transaction using the session
-      await session.transact({ actions: [actionData] });
+      // Log the action data for debugging
+      console.log('Sending transaction with the following data:', actionData);
 
+      // Use InitTransaction to handle the transaction
+      const result = await InitTransaction(actionData);
+      console.log('Transaction success:', result);
       setStatus('Seeds planted successfully!');
     } catch (error) {
-      console.error('Transaction failed:', error);  // Log the error for debugging
+      console.error('Transaction failed:', error);
       setStatus(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
