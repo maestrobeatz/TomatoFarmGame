@@ -8,10 +8,11 @@ import WalletModal from './components/Wallet/WalletModal';
 import NFTList from './components/NFTList';
 import Farms from './components/Farms';
 import AccountInfo from './components/Game/AccountInfo';
-import FarmersList from './components/Game/FarmersList';
 import PlotStatus from './components/Game/PlotStatus';
 import PerformAction from './components/Game/PerformAction';
-import logo from './MaestroBeatzLogo.png';  
+import Modal from './components/Modal';
+import FarmersList from './components/Game/FarmersList';
+import logo from './MaestroBeatzLogo.png';
 import {
   getFarmers,
   getFarmsWithPlots,
@@ -25,7 +26,7 @@ function AppContent() {
   const [farmers, setFarmers] = useState([]);
   const [farms, setFarms] = useState([]);
   const [plots, setPlots] = useState([]);
-  const [isRegistered, setIsRegistered] = useState(false); 
+  const [isRegistered, setIsRegistered] = useState(false);
   const [selectedAction, setSelectedAction] = useState('plantseeds');
   const [selectedNFTs, setSelectedNFTs] = useState({});
   const [loadingStates, setLoadingStates] = useState({
@@ -36,6 +37,8 @@ function AppContent() {
   });
   const [newUsername, setNewUsername] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFarmersModalOpen, setIsFarmersModalOpen] = useState(false); // State for Farmers modal
+  const [isNFTModalOpen, setIsNFTModalOpen] = useState(false); // State for NFT List modal
 
   // Fetch the list of farmers
   const fetchFarmersList = useCallback(async () => {
@@ -83,7 +86,7 @@ function AppContent() {
 
     setLoadingStates((prev) => ({ ...prev, account: true }));
     try {
-      const accountInfoData = await fetchAccountInfoByAccountName(accountName);  
+      const accountInfoData = await fetchAccountInfoByAccountName(accountName);
       setAccountInfo(accountInfoData);
     } catch (err) {
       console.error("Error fetching account info:", err);
@@ -193,6 +196,22 @@ function AppContent() {
     setIsModalOpen(true);
   };
 
+  const handleOpenFarmersModal = () => {
+    setIsFarmersModalOpen(true);
+  };
+
+  const handleCloseFarmersModal = () => {
+    setIsFarmersModalOpen(false);
+  };
+
+  const handleOpenNFTModal = () => {
+    setIsNFTModalOpen(true);
+  };
+
+  const handleCloseNFTModal = () => {
+    setIsNFTModalOpen(false);
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -212,7 +231,7 @@ function AppContent() {
             Register as Farmer
           </button>
         )}
-        {session && isRegistered && (username === null || username === 'N/A') && ( // Only render if username is null or 'N/A'
+        {session && isRegistered && (username === null || username === 'N/A') && (
           <div>
             <input
               type="text"
@@ -232,6 +251,27 @@ function AppContent() {
               <h2>Account Information</h2>
               <AccountInfo accountInfo={accountInfo || {}} />
             </div>
+
+            {/* Farmers and NFT List buttons and modals */}
+            <div className="section">
+              <button onClick={handleOpenFarmersModal} className="farmers-button">
+                Registered Farmers
+              </button>
+              <Modal isOpen={isFarmersModalOpen} onClose={handleCloseFarmersModal}>
+                <h2>Registered Farmers</h2>
+                <FarmersList farmers={farmers} />
+              </Modal>
+
+              {/* NFT List Button and Modal */}
+              <button onClick={handleOpenNFTModal} className="nft-list-button">
+                View Your NFTs
+              </button>
+              <Modal isOpen={isNFTModalOpen} onClose={handleCloseNFTModal}>
+                <h2>Your NFTs</h2>
+                <NFTList actor={session.actor.toString()} />
+              </Modal>
+            </div>
+
             <div className="section">
               <h2>Farms</h2>
               <Farms session={session} farms={farms} plots={plots} />
@@ -239,10 +279,6 @@ function AppContent() {
             <div className="section">
               <h2>Your Plot Status</h2>
               <PlotStatus session={session} plots={plots} />
-            </div>
-            <div className="section">
-              <h2>Your NFTs</h2>
-              <NFTList actor={session.actor.toString()} />
             </div>
             <div className="section">
               <h2>Perform Actions</h2>
@@ -257,10 +293,6 @@ function AppContent() {
           </>
         )}
       </header>
-      <div className="section">
-        <h2>Registered Farmers</h2>
-        <FarmersList farmers={farmers} />
-      </div>
 
       <WalletModal
         show={isModalOpen}

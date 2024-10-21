@@ -1,96 +1,77 @@
-.nft-list {
-  padding: 20px;
-}
-
-.nft-filters {
-  display: flex;
-  gap: 10px;
+.nft-list h2 {
+  font-size: 24px; /* Decrease the main heading size */
+  color: #4CAF50;
   margin-bottom: 20px;
 }
 
-.nft-filters input {
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+.nft-list .nft-filters select {
+  padding: 5px;
+  font-size: 14px; /* Reduce the font size in the filter dropdown */
+  margin-bottom: 15px;
 }
 
 .nft-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjust the width for smaller cards */
+  gap: 10px;
 }
 
 .nft-card {
-  background-color: #f0f0f0;
+  background-color: white;
+  padding: 10px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  width: calc(50% - 10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
   cursor: pointer;
+  text-align: center;
 }
 
 .nft-card img {
   width: 100%;
+  max-width: 100px; /* Limit the image size */
   height: auto;
-}
-
-.nft-details {
-  padding: 10px;
+  object-fit: cover;
 }
 
 .nft-details h3 {
-  margin: 0;
-  font-size: 16px;
+  font-size: 16px; /* Reduce font size for the NFT name */
+  color: #333;
+  margin: 10px 0;
 }
 
 .nft-details p {
-  margin: 5px 0 0;
-  color: #555;
+  font-size: 12px; /* Reduce font size for details */
+  color: #666;
 }
 
-@media (min-width: 600px) {
-  .nft-card {
-    width: 150px;
-  }
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.nft-card:hover {
+  transform: scale(1.05); /* Add a slight hover effect */
 }
 
 .modal-content {
-  background-color: #fff;
+  max-width: 90%; /* Limit the width of the modal */
   padding: 20px;
-  border-radius: 8px;
-  max-width: 90%;
-  max-height: 90%;
-  text-align: center;
+  overflow-y: auto; /* Add scroll if content exceeds the modal */
 }
 
-.modal-content img {
-  width: 100%;
-  height: auto;
+.modal-content h2 {
+  font-size: 20px; /* Reduce modal heading size */
 }
 
-.modal-details {
-  margin-top: 10px;
-}
+@media (max-width: 768px) {
+  .nft-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Adjust for smaller screens */
+  }
 
-.modal-details h3 {
-  margin: 0;
-  font-size: 20px;
-}
+  .nft-card img {
+    max-width: 80px; /* Further limit the image size for small screens */
+  }
 
-.modal-details p {
-  margin: 5px 0;
-  color: #555;
+  .nft-details h3 {
+    font-size: 14px; /* Adjust text size for smaller screens */
+  }
+
+  .nft-details p {
+    font-size: 10px; /* Adjust text size for smaller screens */
+  }
 }
