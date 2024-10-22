@@ -8,8 +8,6 @@ import WalletModal from './components/Wallet/WalletModal';
 import NFTList from './components/NFTList';
 import Farms from './components/Farms';
 import AccountInfo from './components/Game/AccountInfo';
-import PlotStatus from './components/Game/PlotStatus';
-import PerformAction from './components/Game/PerformAction';
 import Modal from './components/Modal';
 import FarmersList from './components/Game/FarmersList';
 import logo from './MaestroBeatzLogo.png';
@@ -185,13 +183,6 @@ function AppContent() {
     }
   };
 
-  const handleActionSelection = async (action) => {
-    setSelectedAction(action);
-    if (['plantseeds', 'waterplants', 'harvest', 'sellcrops', 'refillcan'].includes(action)) {
-      await fetchPlotsData();
-    }
-  };
-
   const handleOpenWallet = () => {
     setIsModalOpen(true);
   };
@@ -274,21 +265,7 @@ function AppContent() {
 
             <div className="section">
               <h2>Farms</h2>
-              <Farms session={session} farms={farms} plots={plots} />
-            </div>
-            <div className="section">
-              <h2>Your Plot Status</h2>
-              <PlotStatus session={session} plots={plots} />
-            </div>
-            <div className="section">
-              <h2>Perform Actions</h2>
-              <div className="action-buttons">
-                <button onClick={() => handleActionSelection('plantseeds')}>Plant Seeds</button>
-                <button onClick={() => handleActionSelection('waterplants')}>Water Plants</button>
-                <button onClick={() => handleActionSelection('harvest')}>Harvest</button>
-                <button onClick={() => handleActionSelection('sellcrops')}>Sell Crops</button>
-              </div>
-              <PerformAction session={session} action={selectedAction} selectedNFTs={selectedNFTs} setSelectedNFTs={setSelectedNFTs} userPlots={plots} />
+              <Farms session={session} farms={farms} plots={plots} selectedNFTs={selectedNFTs} setSelectedNFTs={setSelectedNFTs} />
             </div>
           </>
         )}

@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import '../styles/Farms.css';
-import { getFarmsWithPlots, getAllFarms, getNFTStatus, getUserNFTs } from './api'; // Import necessary API functions
-import { InitTransaction } from '../hooks/useSession'; // Import InitTransaction from useSession
+import { getFarmsWithPlots, getAllFarms, getNFTStatus, getUserNFTs, getPlots } from './api'; 
+import { InitTransaction } from '../hooks/useSession'; 
+import Modal from './Modal';  
+import PerformAction from './Game/PerformAction';  
+import PlotStatus from './Game/PlotStatus'; 
 
 const Farms = ({ session }) => {
   const [userFarms, setUserFarms] = useState([]);
@@ -14,12 +17,19 @@ const Farms = ({ session }) => {
   const [unusedFarmNFTs, setUnusedFarmNFTs] = useState([]);
   const [nftsFetched, setNftsFetched] = useState(false);
 
-  // Fetch user NFTs for available farm NFTs
+  const [isPerformActionModalOpen, setIsPerformActionModalOpen] = useState(false);  
+  const [selectedFarm, setSelectedFarm] = useState(null);  
+  const [selectedAction, setSelectedAction] = useState('plantseeds');  
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
+
+  // NFT state for selected items
+  const [selectedNFTs, setSelectedNFTs] = useState({});
+
+  // Fetch available farm NFTs
   const fetchAvailableFarmNFTs = useCallback(async () => {
     if (!session?.actor || nftsFetched) return;
     try {
       const nftData = await getUserNFTs(session.actor.toString());
-      console.log('Fetched user NFTs:', nftData);
       const farmNFTs = nftData.nfts.filter(nft => nft.template_id === '654617');
       setAvailableFarmNFTs(farmNFTs || []);
       setNftsFetched(true);
@@ -35,7 +45,6 @@ const Farms = ({ session }) => {
     try {
       if (session?.actor) {
         const farmsData = await getFarmsWithPlots(session.actor.toString());
-        console.log("Fetched user farms data:", farmsData);
 
         const userFarmsData = await Promise.all(
           farmsData.farms.map(async (farm) => {
@@ -46,7 +55,6 @@ const Farms = ({ session }) => {
                 is_staked: farmStatus.is_staked,
               };
             } catch (err) {
-              console.error(`Failed to fetch staking status for farm ${farm.farmId}:`, err);
               return {
                 ...farm,
                 is_staked: false,
@@ -69,7 +77,6 @@ const Farms = ({ session }) => {
     setIsLoading(true);
     try {
       const farmsData = await getAllFarms();
-      console.log("Fetched all farms data:", farmsData);
 
       const allFarmsData = await Promise.all(
         farmsData.farms.map(async (farm) => {
@@ -80,7 +87,6 @@ const Farms = ({ session }) => {
               is_staked: farmStatus.is_staked,
             };
           } catch (err) {
-            console.error(`Failed to fetch staking status for farm ${farm.farmId}:`, err);
             return {
               ...farm,
               is_staked: false,
@@ -96,6 +102,17 @@ const Farms = ({ session }) => {
       setIsLoading(false);
     }
   }, []);
+
+  // Fetch plots for a selected farm
+  const fetchFarmPlots = async (farmId) => {
+    try {
+      const farmPlots = await getPlots(farmId);
+      return farmPlots || [];
+    } catch (error) {
+      console.error("Error fetching plots:", error);
+      return [];
+    }
+  };
 
   useEffect(() => {
     if (session && session.actor) {
@@ -115,10 +132,25 @@ const Farms = ({ session }) => {
     }
   }, [availableFarmNFTs, userFarms]);
 
-  // Perform the farm creation transaction
+  // Open modal and load the plots for the selected farm
+  const handleOpenPerformActionModal = async (farm) => {
+    const farmPlots = await fetchFarmPlots(farm.farmId);
+    setSelectedFarm({
+      ...farm,
+      plots: farmPlots,
+    });
+    setIsPerformActionModalOpen(true);  // Ensure modal opens after setting state
+  };
+
+  const handleClosePerformActionModal = () => {
+    setIsPerformActionModalOpen(false);
+    setSelectedFarm(null); 
+    setRefreshTrigger(!refreshTrigger); // Trigger refresh after closing modal
+  };
+
+  // Create farm
   const handleCreateFarm = async () => {
     try {
-      console.log('Performing farm creation...');
       const transactionData = {
         actions: [
           {
@@ -141,10 +173,9 @@ const Farms = ({ session }) => {
 
       const result = await InitTransaction(transactionData);
       if (result) {
-        console.log('Farm created successfully:', result);
         setFarmName('');
         setFarmNftId('');
-        await fetchUserFarmsData(); // Refresh user farms data
+        await fetchUserFarmsData(); 
       }
     } catch (error) {
       console.error('Error creating farm:', error);
@@ -152,7 +183,7 @@ const Farms = ({ session }) => {
     }
   };
 
-  // Handle staking and unstaking farms
+  // Stake or Unstake farm
   const handleStakeUnstake = async (farmId, isStaked) => {
     const actionName = isStaked ? 'unstakefarm' : 'stakefarm';
     try {
@@ -177,11 +208,9 @@ const Farms = ({ session }) => {
 
       const result = await InitTransaction(transactionData);
       if (result) {
-        console.log(`Farm ${isStaked ? 'unstaked' : 'staked'} successfully:`, result);
-        await fetchUserFarmsData(); // Refresh user farms data
+        await fetchUserFarmsData(); 
       }
     } catch (error) {
-      console.error(`Error ${isStaked ? 'unstaking' : 'staking'} farm:`, error);
       setError(`Failed to ${isStaked ? 'unstake' : 'stake'} farm: ` + error.message);
     }
   };
@@ -192,12 +221,23 @@ const Farms = ({ session }) => {
       <p><strong>Farm ID:</strong> {farm.farmId}</p>
       <p><strong>Total Plots:</strong> {farm.plots}</p>
       {isUserFarm && (
-        <button
-          className="action-button"
-          onClick={() => handleStakeUnstake(farm.farmId, farm.is_staked)}
-        >
-          {farm.is_staked ? 'Unstake Farm' : 'Stake Farm'}
-        </button>
+        <>
+          <button
+            className="action-button"
+            onClick={() => handleStakeUnstake(farm.farmId, farm.is_staked)}
+          >
+            {farm.is_staked ? 'Unstake Farm' : 'Stake Farm'}
+          </button>
+
+          <button
+            className="action-button"
+            onClick={() => handleOpenPerformActionModal(farm)}
+          >
+            Perform Actions
+          </button>
+
+          <PlotStatus session={session} refreshTrigger={refreshTrigger} />
+        </>
       )}
     </div>
   );
@@ -205,18 +245,14 @@ const Farms = ({ session }) => {
   return (
     <>
       <h3>Your Farms</h3>
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : (
+      {isLoading ? <p>Loading...</p> : (
         <>
-          {error && <p className="error-message">{error}</p>}
+          {error && <p>{error}</p>}
           {userFarms.length > 0 ? (
             <div className="farms-list">
               {userFarms.map(farm => renderFarmCard(farm, true))}
             </div>
-          ) : (
-            <p>You have no farms.</p>
-          )}
+          ) : <p>You have no farms.</p>}
         </>
       )}
 
@@ -258,6 +294,28 @@ const Farms = ({ session }) => {
           </button>
         </div>
       )}
+
+      {/* Perform Action Modal */}
+      <Modal isOpen={isPerformActionModalOpen} onClose={handleClosePerformActionModal}>
+        <h2>Perform Action on {selectedFarm?.name}</h2>
+        {selectedFarm && (
+          <>
+            <div className="action-buttons">
+              <button onClick={() => setSelectedAction('plantseeds')}>Plant Seeds</button>
+              <button onClick={() => setSelectedAction('waterplants')}>Water Plants</button>
+              <button onClick={() => setSelectedAction('harvest')}>Harvest Crops</button>
+              <button onClick={() => setSelectedAction('sellcrops')}>Sell Crops</button>
+            </div>
+            <PerformAction
+              session={session}
+              action={selectedAction}
+              userPlots={selectedFarm.plots}
+              selectedNFTs={selectedNFTs} // Pass the selected NFTs
+              setSelectedNFTs={setSelectedNFTs} // Function to update selected NFTs
+            />
+          </>
+        )}
+      </Modal>
     </>
   );
 };

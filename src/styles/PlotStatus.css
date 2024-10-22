@@ -1,30 +1,30 @@
 .PlotStatus {
   width: 100%;
-  max-width: 500px; /* Further reduced max width */
+  max-width: 500px;
   margin: 20px auto;
-  padding: 8px; /* Further reduced padding */
+  padding: 8px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
 .PlotStatus h2 {
-  color: #4CAF50; /* Tomato green */
-  margin-bottom: 8px; /* Further reduced margin */
-  font-size: 1.3em; /* Further reduced font size */
+  color: #4CAF50;
+  margin-bottom: 8px;
+  font-size: 1.2em; /* Slightly reduced font size */
 }
 
 .pivot-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.75em; /* Further reduced font size */
+  font-size: 0.7em; /* Reduced font size */
   text-align: left;
 }
 
 .pivot-table th, .pivot-table td {
-  padding: 4px; /* Further reduced padding */
+  padding: 3px; /* Slightly reduced padding */
   border-bottom: 1px solid #ddd;
-  word-wrap: break-word; /* Ensure text wraps within cells */
+  word-wrap: break-word;
 }
 
 .pivot-table th {
@@ -38,29 +38,29 @@
 
 .status-indicator {
   display: inline-block;
-  width: 8px; /* Further reduced size */
-  height: 8px; /* Further reduced size */
+  width: 6px; /* Slightly reduced size */
+  height: 6px;
   border-radius: 50%;
-  background-color: red; /* Default to red */
+  background-color: red;
 }
 
 .status-indicator.green {
-  background-color: #4CAF50; /* Green for success */
+  background-color: #4CAF50;
 }
 
 .status-indicator.red {
-  background-color: #F44336; /* Red for failure */
+  background-color: #F44336;
 }
 
 /* Responsive adjustments for mobile devices */
 @media (max-width: 480px) {
   .pivot-table th, .pivot-table td {
-    padding: 2px; /* Further reduce padding on small screens */
-    font-size: 0.65em; /* Further reduce font size */
+    padding: 1px; /* Further reduce padding */
+    font-size: 0.6em; /* Further reduce font size */
   }
   
   .status-indicator {
-    width: 6px; /* Further reduce size */
-    height: 6px; /* Further reduce size */
+    width: 5px; /* Further reduce size */
+    height: 5px;
   }
 }

@@ -8,137 +8,181 @@
 .nft-display-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px; /* Increased gap for better spacing */
-  margin-bottom: 30px; /* Extra margin to separate content */
+  gap: 15px;
+  margin-bottom: 30px;
   justify-content: center;
-  width: 100%; /* Ensure the container adjusts to the screen size */
+  width: 100%;
 }
 
-/* Updated to ensure that the container doesn't overflow on small screens */
+.nft-select-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.nft-select-row .nft-display {
+  flex: 1;
+}
+
+/* Styling for individual NFT display cards */
 .nft-display {
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 15px; /* More padding for a cleaner look */
-  background-color: #f9f9f9; /* Softer background */
-  max-width: 180px;
+  padding: 15px;
+  background-color: #f9f9f9;
   text-align: center;
-  flex: 1;
-  min-width: 140px; /* Ensures a minimum width for smaller screens */
-  overflow-x: hidden; /* Prevent horizontal overflow */
-  transition: transform 0.3s ease, background-color 0.3s ease; /* Added transition for hover effect */
+  max-width: 220px;
+  min-width: 180px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  margin: 0 auto;
 }
 
 .nft-display:hover {
-  transform: scale(1.05); /* Slight scaling on hover for interactivity */
-  background-color: #f0f8ff; /* Light blue background on hover */
+  transform: scale(1.05);
+  background-color: #f0f8ff;
 }
 
 .nft-display img.nft-image {
-  max-width: 100%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
   height: auto;
-  border-radius: 8px;
-  margin-top: 10px;
-  max-height: 100px; /* Slightly increased max height */
+  max-width: 100%;
+  max-height: 150px;
 }
 
 .nft-display h3 {
-  font-size: 14px; /* Increased font size for better readability */
+  font-size: 14px;
   margin: 10px 0 5px;
   font-weight: bold;
-  color: #333; /* Darker color for better contrast */
+  color: #333;
 }
 
 .nft-display p {
-  font-size: 12px; /* Slightly increased font size */
+  font-size: 12px;
   margin: 5px 0;
-  color: #555; /* Softer gray for descriptive text */
+  color: #555;
 }
 
-/* Improved select dropdown appearance */
 .nft-display select {
-  width: 100%; 
-  max-width: 220px; 
-  padding: 10px; /* Increased padding for easier interaction */
+  width: 100%;
+  padding: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
   background-color: #fff;
   font-size: 14px;
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  box-sizing: border-box;
-  transition: border-color 0.3s ease; /* Smooth border transition on focus */
 }
 
 .nft-display select:focus {
-  border-color: #007bff; /* Blue border on focus */
-  outline: none; /* Remove default outline */
+  border-color: #007bff;
+  outline: none;
 }
 
-/* Adjust for smaller screens */
-@media (max-width: 768px) {
-  .nft-display {
-    max-width: 140px;
-    min-width: 120px;
-  }
-
-  .nft-display img.nft-image {
-    max-height: 80px;
-  }
-
-  .perform-action button {
-    width: 85%;
-  }
-
-  .nft-display select {
-    max-width: 100%;
-  }
+/* Centering message box */
+.message-box {
+  border: 2px solid #ccc;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px auto;
+  text-align: center;
+  color: #555;
+  max-width: 500px;
 }
 
-.progress-container {
-  margin-top: 10px;
+.message-box p {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
 }
 
-.progress-label {
-  font-size: 11px;
-  margin-top: 5px;
-}
-
-/* Styling for the Refill Button */
-.refill-button-blue {
-  margin-top: 10px;
-  font-size: 14px; /* Increased font size for better readability */
-  padding: 8px 16px; /* More padding for a consistent button size */
-  background-color: #007bff; /* Blue background for the refill button */
+/* Add Watering Can button styling */
+.add-watering-button {
+  width: 60%;
+  margin: 10px auto;
+  padding: 10px;
+  background-color: #28a745;
   color: white;
+  font-size: 16px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.refill-button-blue:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+.add-watering-button:hover {
+  background-color: #218838;
 }
 
-.refill-button-blue:disabled {
-  background-color: #6c757d; /* Gray background when disabled */
-  cursor: not-allowed;
+/* Layout for medium to smaller screens */
+@media (max-width: 768px) {
+  .nft-select-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nft-display {
+    max-width: 100%;
+    min-width: unset;
+  }
+
+  .nft-display img.nft-image {
+    max-height: 100px;
+  }
+
+  .perform-action button {
+    width: 85%;
+  }
 }
 
+/* Further adjustments for mobile screens */
+@media (max-width: 480px) {
+  .nft-display h3 {
+    font-size: 12px;
+  }
+
+  .nft-display p {
+    font-size: 10px;
+  }
+
+  .nft-display img.nft-image {
+    max-height: 80px;
+  }
+
+  .message-box p {
+    font-size: 14px;
+  }
+
+  .add-watering-button {
+    font-size: 14px;
+    padding: 8px;
+    width: 70%;
+  }
+
+  .perform-action button {
+    width: 80%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .nft-display-container {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Plot select dropdown */
 .plot-select {
   margin-bottom: 20px;
 }
 
-.alert {
-  margin-top: 20px;
-}
-
+/* General button styling */
 .perform-action button {
   width: 50%;
   margin: 10px auto;
-  padding: 12px; /* Increased padding for a larger click area */
+  padding: 12px;
   font-size: 16px;
-  background-color: #4CAF50; /* Updated to a brighter green for better visibility */
+  background-color: #4CAF50;
   color: white !important;
   font-weight: bold !important;
   border: none;
@@ -148,20 +192,51 @@
 }
 
 .perform-action button:disabled {
-  background-color: #f44336; /* Red background for disabled state */
+  background-color: #f44336;
   color: white;
   cursor: not-allowed;
 }
 
 .perform-action button:hover:not(:disabled) {
-  background-color: #45a049; /* Slightly darker green on hover */
+  background-color: #45a049;
 }
 
-/* Add button focus style for accessibility */
 .perform-action button:focus {
-  outline: 3px solid #007bff; /* Blue outline for focus */
+  outline: 3px solid #007bff;
 }
 
-.perform-action button:focus:not(:disabled) {
-  background-color: #45a049; /* Keep hover effect even when focused */
+.alert {
+  margin-top: 20px;
+}
+
+/* Styling for the Refill Button */
+.refill-button-blue {
+  margin-top: 10px;
+  font-size: 14px;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.refill-button-blue:hover {
+  background-color: #0056b3;
+}
+
+.refill-button-blue:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Progress bar styling */
+.progress-container {
+  margin-top: 10px;
+}
+
+.progress-label {
+  font-size: 11px;
+  margin-top: 5px;
 }

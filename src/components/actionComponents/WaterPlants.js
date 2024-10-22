@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api'; // Assuming api.js is where your API functions are stored
 
-const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
+const WaterPlants = ({ session, plotId, selectedNFTs, setSelectedNFTs, nftDetails = [] }) => {
   const [status, setStatus] = useState('');
   const [wateringLoading, setWateringLoading] = useState(false);  // Separate loading state for watering
   const [refillLoading, setRefillLoading] = useState(false);  // Separate loading state for refilling
   const [usesLeft, setUsesLeft] = useState(null);
-  const [wateringCanExists, setWateringCanExists] = useState(true); // To track if watering can is found or not
+  const [wateringCanExists, setWateringCanExists] = useState(true);
 
+  // Fetch the watering can data
   const fetchWateringCanData = useCallback(async () => {
     if (selectedNFTs.wateringCan) {
       try {
         const wateringCanData = await api.getWateringCanData(selectedNFTs.wateringCan);
+        console.log("Fetched watering can data:", wateringCanData); // Log the data
         if (wateringCanData && wateringCanData.usesLeft !== undefined) {
           setUsesLeft(wateringCanData.usesLeft);
           setWateringCanExists(true);
@@ -20,9 +22,14 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
           setWateringCanExists(false); // If no data, mark it as not existing
         }
       } catch (error) {
-        setStatus(`Error fetching watering can data: ${error.message}`);
-        setUsesLeft(null);
-        setWateringCanExists(false); // Mark as not existing on error
+        if (error.response && error.response.status === 404) {
+          setUsesLeft(null);
+          setWateringCanExists(false); // Watering can hasn't been added yet
+        } else {
+          setStatus(`Error fetching watering can data: ${error.message}`);
+          setUsesLeft(null);
+          setWateringCanExists(false);
+        }
       }
     } else {
       setUsesLeft(null);
@@ -30,6 +37,7 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
     }
   }, [selectedNFTs.wateringCan]);
 
+  // Fetch watering can data whenever the watering can selection changes
   useEffect(() => {
     if (selectedNFTs.wateringCan) {
       fetchWateringCanData();
@@ -39,6 +47,7 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
     }
   }, [selectedNFTs.wateringCan, fetchWateringCanData]);
 
+  // Handle the watering of plants
   const handleWaterPlants = useCallback(async () => {
     if (!session || !session.actor) {
       setStatus('Error: Please login first.');
@@ -65,6 +74,8 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
           watering_can_nft_id: selectedNFTs.wateringCan,
         }
       };
+      
+      console.log("Sending watering action:", actionData); // Log the transaction data
       await session.transact({ actions: [actionData] });
       setStatus('Plants watered successfully.');
       fetchWateringCanData(); // Refresh watering can data after watering
@@ -75,6 +86,7 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
     }
   }, [session, plotId, selectedNFTs, fetchWateringCanData]);
 
+  // Handle the refilling of the watering can
   const handleRefillCan = useCallback(async () => {
     if (!session || !session.actor) {
       setStatus('Error: Please login first.');
@@ -96,6 +108,8 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
           watering_can_nft_id: selectedNFTs.wateringCan,
         }
       };
+      
+      console.log("Sending refill action:", actionData);  // Log the transaction data
       await session.transact({ actions: [actionData] });
       setStatus('Watering can refilled successfully.');
       fetchWateringCanData(); // Refresh watering can data after refilling
@@ -106,6 +120,7 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
     }
   }, [session, selectedNFTs, fetchWateringCanData]);
 
+  // Add watering can functionality if it hasn't been added yet
   const handleAddWaterCan = useCallback(async () => {
     if (!session || !session.actor) {
       setStatus('Error: Please login first.');
@@ -115,6 +130,7 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
     try {
       setWateringLoading(true);
       const response = await api.addWaterCan(selectedNFTs.wateringCan); // Add can through API
+      console.log("Watering can added:", response); // Log the response
       if (response.success) {
         setStatus('Watering can added successfully.');
         fetchWateringCanData(); // Refresh data after adding the can
@@ -128,13 +144,39 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
     }
   }, [session, selectedNFTs.wateringCan, fetchWateringCanData]);
 
+  // Render the watering can selection dropdown
+  const renderWateringCanSelect = () => {
+    if (!nftDetails || nftDetails.length === 0) return null;
+
+    const relevantNFTs = nftDetails.filter(nft => nft.template.template_id === '653268');
+    const handleNFTChange = (e) => {
+      setSelectedNFTs(prev => ({ ...prev, wateringCan: e.target.value }));
+    };
+
+    return (
+      <div className="nft-select">
+        <label htmlFor="watering-can-select">Select Watering Can</label>
+        <select
+          id="watering-can-select"
+          onChange={handleNFTChange}
+          value={selectedNFTs.wateringCan || ''}
+          className="w-full p-2 border rounded"
+        >
+          <option value="" disabled>Select Watering Can</option>
+          {relevantNFTs.map(nft => (
+            <option key={nft.asset_id} value={nft.asset_id}>
+              Issue: {nft.template_mint || 'Unknown'}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
   return (
     <div>
-      <button onClick={handleWaterPlants} disabled={wateringLoading || !plotId || !selectedNFTs.wateringCan || !wateringCanExists}>
-        {wateringLoading ? 'Watering...' : 'Water Plants'}
-      </button>
-      {status && <p>{status}</p>}
-
+      {renderWateringCanSelect()} {/* Watering can selection */}
+      
       {selectedNFTs.wateringCan && (
         <>
           <img
@@ -145,12 +187,12 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
           {usesLeft !== null ? (
             <p>Uses left for this watering can: {usesLeft}</p>
           ) : (
-            <>
+            <div className="alert-box">
               <p>This watering can has not been added yet.</p>
               <button onClick={handleAddWaterCan} disabled={wateringLoading}>
                 {wateringLoading ? 'Adding...' : 'Add Watering Can'}
               </button>
-            </>
+            </div>
           )}
         </>
       )}
@@ -162,6 +204,11 @@ const WaterPlants = ({ session, plotId, selectedNFTs, nftDetails }) => {
           </button>
         </div>
       )}
+
+      <button onClick={handleWaterPlants} disabled={wateringLoading || !selectedNFTs.wateringCan || !wateringCanExists}>
+        {wateringLoading ? 'Watering...' : 'Water Plants'}
+      </button>
+      {status && <p>{status}</p>}
     </div>
   );
 };
