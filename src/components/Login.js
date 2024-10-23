@@ -21,29 +21,31 @@ const Login = ({ session, login, logout }) => {
   };
 
   return (
-    <div className={`login-container ${session ? 'logged-in' : ''}`}>
-      {session ? (
-        <button className="logout-button" onClick={handleLogout}>
-          LOGOUT
-        </button>
-      ) : (
-        <>
+    <>
+      {!session ? (
+        // Container visible during login
+        <div className="login-container">
           <button className="login-button" onClick={login}>
             LOGIN
           </button>
           <button className="blue-button" onClick={handleOnboarding}>
             New User? Start Here
           </button>
-        </>
-      )}
 
-      {/* Display the onboarding process when the user clicks "New User" */}
-      {!session && showOnboarding && (
-        <div style={{ marginTop: '20px' }}>
-          <Onboarding />
+          {/* Display the onboarding process when the user clicks "New User" */}
+          {!session && showOnboarding && (
+            <div style={{ marginTop: '20px' }}>
+              <Onboarding />
+            </div>
+          )}
         </div>
+      ) : (
+        // No container after login, just the logout button
+        <button className="logout-button" onClick={handleLogout}>
+          LOGOUT
+        </button>
       )}
-    </div>
+    </>
   );
 };
 

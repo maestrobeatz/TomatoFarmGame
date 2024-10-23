@@ -11,8 +11,6 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const PerformAction = ({ session, action, userPlots = [], selectedNFTs, setSelectedNFTs }) => {
   const [nftDetails, setNftDetails] = useState([]);
   const [plotStatus, setPlotStatus] = useState([]);
-  const [loadingPlots, setLoadingPlots] = useState(true);
-  const [error, setError] = useState(null);
 
   // Fetch the user's NFTs
   const fetchUserNFTs = useCallback(async () => {
@@ -33,7 +31,6 @@ const PerformAction = ({ session, action, userPlots = [], selectedNFTs, setSelec
   const fetchUserPlots = useCallback(async () => {
     if (!session?.actor) return;
 
-    setLoadingPlots(true);
     try {
       const response = await fetch(`${API_BASE_URL}/plots/${session.actor}`);
       if (!response.ok) {
@@ -48,10 +45,7 @@ const PerformAction = ({ session, action, userPlots = [], selectedNFTs, setSelec
       const data = await response.json();
       setPlotStatus(data.plots || []);
     } catch (error) {
-      setError(error.message);
       console.error("Error fetching plot status:", error);
-    } finally {
-      setLoadingPlots(false);
     }
   }, [session]);
 

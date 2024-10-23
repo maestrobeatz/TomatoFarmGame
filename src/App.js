@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import useSession from './hooks/useSession';
-import { InitTransaction } from './components/transactionHandler'; // Import transaction handler
+import { InitTransaction } from './components/transactionHandler'; 
 import Login from './components/Login';
 import WalletModal from './components/Wallet/WalletModal';
 import NFTList from './components/NFTList';
@@ -11,16 +11,12 @@ import AccountInfo from './components/Game/AccountInfo';
 import Modal from './components/Modal';
 import FarmersList from './components/Game/FarmersList';
 import logo from './MaestroBeatzLogo.png';
-import {
-  getFarmers,
-  getFarmsWithPlots,
-  getPlots
-} from './components/api';
-import { fetchAccountInfoByAccountName } from './components/Wallet/walletApi/accountApi';
+import { getFarmers, getFarmsWithPlots, getPlots } from './components/api';
+import walletFacade from './components/Wallet/walletApi/walletApi';
 
 function AppContent() {
   const { session, handleLogin, handleLogout } = useSession();
-  const [accountInfo, setAccountInfo] = useState(null);
+  const [accountInfo, setAccountInfo] = useState(null); 
   const [farmers, setFarmers] = useState([]);
   const [farms, setFarms] = useState([]);
   const [plots, setPlots] = useState([]);
@@ -35,10 +31,9 @@ function AppContent() {
   });
   const [newUsername, setNewUsername] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isFarmersModalOpen, setIsFarmersModalOpen] = useState(false); // State for Farmers modal
-  const [isNFTModalOpen, setIsNFTModalOpen] = useState(false); // State for NFT List modal
+  const [isFarmersModalOpen, setIsFarmersModalOpen] = useState(false); 
+  const [isNFTModalOpen, setIsNFTModalOpen] = useState(false); 
 
-  // Fetch the list of farmers
   const fetchFarmersList = useCallback(async () => {
     setLoadingStates((prev) => ({ ...prev, farmers: true }));
     try {
@@ -51,7 +46,6 @@ function AppContent() {
     }
   }, []);
 
-  // Check if the current user is a registered farmer
   const checkFarmerRegistration = useCallback(() => {
     if (session && session.actor) {
       const isUserRegistered = farmers.some(farmer => farmer.account === session.actor.toString());
@@ -59,7 +53,6 @@ function AppContent() {
     }
   }, [session, farmers]);
 
-  // Find the current user's username in the farmers list
   const currentUser = session && session.actor ? farmers.find(farmer => farmer.account === session.actor.toString()) : null;
   const username = currentUser?.username || null;
 
@@ -84,10 +77,13 @@ function AppContent() {
 
     setLoadingStates((prev) => ({ ...prev, account: true }));
     try {
-      const accountInfoData = await fetchAccountInfoByAccountName(accountName);
-      setAccountInfo(accountInfoData);
+      const accountResources = await walletFacade.fetchAccountResources(accountName);
+      setAccountInfo({
+        accountName,
+        ...accountResources 
+      });
     } catch (err) {
-      console.error("Error fetching account info:", err);
+      console.error("Error fetching account info or resources:", err);
     } finally {
       setLoadingStates((prev) => ({ ...prev, account: false }));
     }
@@ -127,7 +123,7 @@ function AppContent() {
     try {
       const transactionData = {
         actions: [{
-          account: process.env.REACT_APP_CONTRACT_NAME, // Use contract name from .env
+          account: process.env.REACT_APP_CONTRACT_NAME,
           name: "regfarmer",
           authorization: [{
             actor: session.actor,
@@ -158,7 +154,7 @@ function AppContent() {
     try {
       const transactionData = {
         actions: [{
-          account: process.env.REACT_APP_CONTRACT_NAME, // Use contract name from .env
+          account: process.env.REACT_APP_CONTRACT_NAME,
           name: "addusername",
           authorization: [{
             actor: session.actor,
@@ -171,13 +167,9 @@ function AppContent() {
         }]
       };
 
-      // Perform the transaction
       const result = await InitTransaction(transactionData);
       console.log('Username creation transaction result:', result);
-
-      // After creating the username, refresh the farmers list
       await fetchFarmersList();
-
     } catch (err) {
       console.error("Failed to create username:", err);
     }
@@ -243,7 +235,6 @@ function AppContent() {
               <AccountInfo accountInfo={accountInfo || {}} />
             </div>
 
-            {/* Farmers and NFT List buttons and modals */}
             <div className="section">
               <button onClick={handleOpenFarmersModal} className="farmers-button">
                 Registered Farmers
@@ -253,7 +244,6 @@ function AppContent() {
                 <FarmersList farmers={farmers} />
               </Modal>
 
-              {/* NFT List Button and Modal */}
               <button onClick={handleOpenNFTModal} className="nft-list-button">
                 View Your NFTs
               </button>

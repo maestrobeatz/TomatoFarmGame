@@ -1,30 +1,19 @@
 /* Login.css */
 
-/* General container setup - making it modal-like */
+/* General container setup */
 .login-container {
     background-color: white; /* Modal-like white background */
-    padding: 30px; /* Increased padding for a modal effect */
-    border-radius: 10px; /* Rounded corners */
-    width: 400px; /* Modal width */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Modal shadow for depth */
+    padding: 30px;
+    border-radius: 10px;
+    width: 400px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 50px auto; /* Center the modal on the page */
+    margin: 0 auto; /* Horizontal centering */
     text-align: center;
-    overflow-x: hidden;
-}
-
-/* Logo styling */
-.logo-container {
-    margin-bottom: 20px;
-}
-
-.logo {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
+    margin-top: 50px; /* Add some margin from the top */
 }
 
 /* Buttons styling */
@@ -35,7 +24,7 @@
 }
 
 .button {
-    width: 250px; /* Modal-like width for buttons */
+    width: 250px;
     padding: 15px;
     border: none;
     border-radius: 8px;
@@ -43,7 +32,7 @@
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
-    margin: 10px 0; /* Space between buttons */
+    margin: 10px 0;
 }
 
 .yellow-button {
@@ -75,25 +64,10 @@
     border-radius: 5px;
 }
 
-/* Close button styling */
-.close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-.close-button:hover {
-    color: red;
-}
-
 /* Mobile responsiveness */
 @media (max-width: 768px) {
     .login-container {
-        width: 100%; /* Full width for mobile */
+        width: 90%; /* Full width for mobile */
         padding: 20px;
     }
 

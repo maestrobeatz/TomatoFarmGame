@@ -1,3 +1,14 @@
+/* Wallet Modal Backdrop */
+.wallet-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Backdrop to make the modal pop out */
+    z-index: 999; /* Lower z-index than the modal itself */
+}
+
 /* Wallet Modal Container */
 .wallet-modal-container {
     background-color: #1e1e1e;
@@ -5,12 +16,18 @@
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    max-width: 600px; /* Set a max-width for better control */
-    margin: auto; /* Center the modal */
+    max-width: 800px; /* Increased width for better visibility */
+    width: 100%; /* Set to full width for mobile responsiveness */
+    margin: 20px auto; /* Center the modal */
     max-height: 80vh; /* Limit modal height to 80% of the viewport */
     overflow-y: auto; /* Enable scrolling if content exceeds the modal's height */
-    z-index: 1060; /* Ensure the modal appears above Wharfkit modal */
-    position: relative; /* Make sure z-index works */
+    z-index: 1060; /* Ensure the modal appears above other content */
+    
+    /* Center the modal */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /* Modal Header */
@@ -187,6 +204,11 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .wallet-modal-container {
+        width: 95%; /* Adjust width for better mobile experience */
+        padding: 10px;
+    }
+
     .wallet-modal-options {
         flex-direction: column;
     }
